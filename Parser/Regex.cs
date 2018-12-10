@@ -128,11 +128,6 @@ namespace Parser
         /// </summary>
         public int RegexFoundPosition { set; get; }
 
-        /// <summary>
-        /// Flag if the found result should be downloaded
-        /// </summary>
-        public bool DownloadResult { set; get; }
-
         #endregion Properties
 
         #region Methodes
@@ -143,14 +138,12 @@ namespace Parser
         /// <param name="regexExpression">The string for the search string of the regex</param>
         /// <param name="regexFoundPosition">The index of the found value</param>
         /// <param name="resultEmpty">Flag if the parsing result can be empty</param>
-        /// <param name="downloadResult">Flag if the result should be downloaded</param>
         /// <param name="regexOptions">The list with the regex options. This parameter is optional</param>
-        public RegexElement(string regexExpression, int regexFoundPosition, bool resultEmpty, bool downloadResult, List<RegexOptions> regexOptions = null)
+        public RegexElement(string regexExpression, int regexFoundPosition, bool resultEmpty, List<RegexOptions> regexOptions = null)
         {
             RegexExpression = regexExpression;
             RegexFoundPosition = regexFoundPosition;
             ResultEmpty = resultEmpty;
-            DownloadResult = downloadResult;
             RegexOptions = regexOptions;
         }
 

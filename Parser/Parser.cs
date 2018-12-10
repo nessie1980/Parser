@@ -481,8 +481,8 @@ namespace Parser
                                         PercentOfProgress = 15;
                                         SetAndSendState(ParserInfoState);
 
-                                        int statusValueStep = (100 - 15) / RegexList.RegexListDictionary.Count;
-                                        int statusValue = 15;
+                                        var statusValueStep = (100 - 15) / RegexList.RegexListDictionary.Count;
+                                        var statusValue = 15;
 #if _DEBUG_THREADFUNCTION
                                         Console.WriteLine("Parsing-Step: {0}", statusValueStep);
 #endif
@@ -512,8 +512,8 @@ namespace Parser
                                             Console.WriteLine("RegexString: {0}", regexElement.RegexExpression);
 #endif
                                             // Build the regex options
-                                            List<RegexOptions> tmpRegexOptionsList = regexElement.RegexOptions;
-                                            RegexOptions tmpRegexOptions = RegexOptions.None;
+                                            var tmpRegexOptionsList = regexElement.RegexOptions;
+                                            var tmpRegexOptions = RegexOptions.None;
 
                                             if (tmpRegexOptionsList != null && tmpRegexOptionsList.Count > 0)
                                             {
@@ -530,7 +530,7 @@ namespace Parser
 
                                             // Search for the value
                                             var added = false;
-                                            MatchCollection matchCollection = Regex.Matches(TextForParsing, regexExpression.Value.RegexExpression, tmpRegexOptions);
+                                            var matchCollection = Regex.Matches(TextForParsing, regexExpression.Value.RegexExpression, tmpRegexOptions);
 
                                             // Add the parsing result if a result has been found
                                             if (regexExpression.Value.RegexFoundPosition < matchCollection.Count)
@@ -539,7 +539,7 @@ namespace Parser
                                                 {
                                                     ParsingResult = new Dictionary<string, List<string>>();
                                                 }
-                                                List<string> listResults = new List<string>();
+                                                var listResults = new List<string>();
 
                                                 // If a specific search result should be taken or all results (RegexFoundPosition == -1)
                                                 if (regexExpression.Value.RegexFoundPosition >= 0)
@@ -547,63 +547,28 @@ namespace Parser
 #if _DEBUG_THREADFUNCTION
                                                     Console.WriteLine(@"Value: '{0}' = '{1}'", regexExpression.Key, matchCollection[regexExpression.Value.RegexFoundPosition].Groups[1].Value);
 #endif
-                                                    if (regexExpression.Value.DownloadResult)
+                                                    for (var i = 1; i < matchCollection[regexExpression.Value.RegexFoundPosition].Groups.Count; i++)
                                                     {
-
-                                                        // Create web client with the given or default user agent identifier.
-                                                        using (var client = new WebClient())
+                                                        // Check if thread should be canceled
+                                                        if (CancelThread)
                                                         {
-                                                            // Browser identifier (e.g. FireFox 36)
-                                                            client.Headers["User-Agent"] = UserAgentIdentifier;
-
-                                                            // Download a string
-#if _DEBUG_THREADFUNCTION
-                                                            Console.WriteLine(@"DownLoad-WebSide: {0}", matchCollection[regexExpression.Value.RegexFoundPosition].Groups[1].Value);
-#endif
-                                                            WebSiteDownloadComplete = false;
-                                                            client.DownloadProgressChanged += OnWebClientDownloadProgressChanged;
-                                                            client.DownloadDataCompleted += OnWebClientDownloadDataContentCompleted;
-                                                            client.DownloadDataAsync(new Uri(matchCollection[regexExpression.Value.RegexFoundPosition].Groups[1].Value));
-                                                            while (!WebSiteDownloadComplete)
-                                                            {
-                                                                // Check if thread should be canceled
-                                                                if (CancelThread)
-                                                                {
-
-                                                                    ParserErrorCode = ParserErrorCodes.CancelThread;
-                                                                    LastException = null;
-                                                                    PercentOfProgress = 0;
-                                                                    SetAndSendState(ParserInfoState);
-                                                                    WebSiteDownloadComplete = false;
-                                                                    client.CancelAsync();
-                                                                }
-                                                                Thread.Sleep(10);
-                                                            }
-                                                            client.DownloadProgressChanged -= OnWebClientDownloadProgressChanged;
-                                                            client.DownloadDataCompleted -= OnWebClientDownloadDataContentCompleted;
-
-                                                            listResults.Add(Convert.ToBase64String(WebSiteBytesDataContent));
+                                                            ParserErrorCode = ParserErrorCodes.CancelThread;
+                                                            LastException = null;
+                                                            PercentOfProgress = 0;
+                                                            SetAndSendState(ParserInfoState);
                                                         }
-                                                    }
-                                                    else
-                                                    {
-                                                        for (int i = 1; i < matchCollection[regexExpression.Value.RegexFoundPosition].Groups.Count; i++)
-                                                        {
-                                                            // Check if thread should be canceled
-                                                            if (CancelThread)
-                                                            {
-                                                                ParserErrorCode = ParserErrorCodes.CancelThread;
-                                                                LastException = null;
-                                                                PercentOfProgress = 0;
-                                                                SetAndSendState(ParserInfoState);
-                                                            }
 
-                                                            if (matchCollection[regexExpression.Value.RegexFoundPosition].Groups[i].Value != "")
-                                                            {
-                                                                listResults.Add(matchCollection[regexExpression.Value.RegexFoundPosition].Groups[i].Value);
-                                                                i = matchCollection[regexExpression.Value.RegexFoundPosition].Groups.Count;
-                                                            }
-                                                        }
+                                                        // Check if the result is empty
+                                                        if (matchCollection[regexExpression.Value.RegexFoundPosition]
+                                                                .Groups[i].Value == "") continue;
+
+                                                        listResults.Add(
+                                                            matchCollection[
+                                                                    regexExpression.Value.RegexFoundPosition]
+                                                                .Groups[i]
+                                                                .Value);
+                                                        i = matchCollection[
+                                                            regexExpression.Value.RegexFoundPosition].Groups.Count;
                                                     }
                                                 }
                                                 else
@@ -621,76 +586,21 @@ namespace Parser
 #if _DEBUG_THREADFUNCTION
                                                         Console.WriteLine(@"Value: '{0}' = '{1}'", regexExpression.Key, match.Groups[1].Value);
 #endif
-                                                        if (regexExpression.Value.DownloadResult)
+                                                        for (var i = 1; i < match.Groups.Count; i++)
                                                         {
-                                                            for (int i = 1; i < match.Groups.Count; i++)
+                                                            // Check if thread should be canceled
+                                                            if (CancelThread)
                                                             {
-                                                                // Check if thread should be canceled
-                                                                if (CancelThread)
-                                                                {
-                                                                    ParserErrorCode = ParserErrorCodes.CancelThread;
-                                                                    LastException = null;
-                                                                    PercentOfProgress = 0;
-                                                                    SetAndSendState(ParserInfoState);
-                                                                }
-
-                                                                if (match.Groups[i].Value != "")
-                                                                {
-
-                                                                    // Create web client with the given or default user agent identifier.
-                                                                    using (var client = new WebClient())
-                                                                    {
-                                                                        // Browser identifier (e.g. FireFox 36)
-                                                                        client.Headers["User-Agent"] = UserAgentIdentifier;
-
-                                                                        // Download a string
-#if _DEBUG_THREADFUNCTION
-                                                                        Console.WriteLine(@"DownLoad-WebSide: {0}", match.Groups[i].Value);
-#endif
-                                                                        WebSiteDownloadComplete = false;
-                                                                        client.DownloadProgressChanged += OnWebClientDownloadProgressChanged;
-                                                                        client.DownloadDataCompleted += OnWebClientDownloadDataContentCompleted;
-                                                                        client.DownloadDataAsync(new Uri(match.Groups[i].Value));
-                                                                        while (!WebSiteDownloadComplete)
-                                                                        {
-                                                                            // Check if thread should be canceled
-                                                                            if (CancelThread)
-                                                                            {
-
-                                                                                ParserErrorCode = ParserErrorCodes.CancelThread;
-                                                                                LastException = null;
-                                                                                PercentOfProgress = 0;
-                                                                                SetAndSendState(ParserInfoState);
-                                                                                WebSiteDownloadComplete = false;
-                                                                                client.CancelAsync();
-                                                                            }
-                                                                            Thread.Sleep(10);
-                                                                        }
-                                                                        client.DownloadProgressChanged -= OnWebClientDownloadProgressChanged;
-                                                                        client.DownloadDataCompleted -= OnWebClientDownloadDataContentCompleted;
-                                                                        listResults.Add(Convert.ToBase64String(WebSiteBytesDataContent));
-                                                                    }
-                                                                }
+                                                                ParserErrorCode = ParserErrorCodes.CancelThread;
+                                                                LastException = null;
+                                                                PercentOfProgress = 0;
+                                                                SetAndSendState(ParserInfoState);
                                                             }
-                                                        }
-                                                        else
-                                                        {
-                                                            for (int i = 1; i < match.Groups.Count; i++)
-                                                            {
-                                                                // Check if thread should be canceled
-                                                                if (CancelThread)
-                                                                {
-                                                                    ParserErrorCode = ParserErrorCodes.CancelThread;
-                                                                    LastException = null;
-                                                                    PercentOfProgress = 0;
-                                                                    SetAndSendState(ParserInfoState);
-                                                                }
 
-                                                                if (match.Groups[i].Value != "")
-                                                                {
-                                                                    listResults.Add(match.Groups[i].Value);
+                                                            if (match.Groups[i].Value != "")
+                                                            {
+                                                                listResults.Add(match.Groups[i].Value);
 //                                                                    i = match.Groups.Count;
-                                                                }
                                                             }
                                                         }
                                                     }
@@ -817,35 +727,6 @@ namespace Parser
                 WebSiteContent = e.Result.LongLength > 0 ? Encoding.UTF8.GetString(e.Result) : "";
 
                 ParserInfoState.PercentageDownload = 100;
-                WebSiteDownloadComplete = true;
-            }
-            catch (WebException webEx)
-            {
-                // Set state
-                State = ParserState.Idle;
-                ParserErrorCode = ParserErrorCodes.WebExceptionOccured;
-                LastException = webEx;
-                PercentOfProgress = 0;
-                SetAndSendState(ParserInfoState);
-            }
-        }
-
-        /// <summary>
-        /// This function sets the downloaded website content to the class variable
-        /// </summary>
-        /// <param name="sender">Web client which download the website data content asynchronous</param>
-        /// <param name="e">DownloadDataCompletedEventArgs with the result</param>
-        public void OnWebClientDownloadDataContentCompleted(object sender, DownloadDataCompletedEventArgs e)
-        {
-            try
-            {
-                if (e.Error != null || e.Cancelled) return;
-
-                if (e.Result.LongLength > 0)
-                    WebSiteBytesDataContent = e.Result;
-                else
-                    Array.Clear(WebSiteBytesDataContent, 0, WebSiteBytesDataContent.Length);
-
                 WebSiteDownloadComplete = true;
             }
             catch (WebException webEx)
