@@ -326,8 +326,12 @@ namespace Parser
         /// <param name="regexList">Dictionary with the regex strings and the regex options for it</param>
         /// <param name="encoding">Encoding for the download content</param>
         // ReSharper disable once RedundantBaseConstructorCall
-        public Parser(bool webParsing, string webSiteUrlOrText, RegExList regexList, string encoding) : base ()
+        public Parser(bool webParsing, string webSiteUrlOrText, RegExList regexList, string encoding) : this ()
         {
+#if _DEBUG_THREADFUNCTION
+            Console.WriteLine(@"Parameter constructor");
+#endif
+
             WebParsing = webParsing;
 
             // Check if a web content should be parsed or a text
@@ -359,6 +363,9 @@ namespace Parser
             {
                 if (ThreadRunning)
                 {
+#if _DEBUG_THREADFUNCTION
+                    Console.WriteLine(@"ThreadRunning: {0}", ThreadRunning);
+#endif
                     try
                     {
                         lock (_thisLockThread)
@@ -767,7 +774,8 @@ namespace Parser
                         return false;
                     }
 
-                    if (WebSiteUrl == @"invalid")
+                    // Check if the given web address is not invalid and a web parsing should be done
+                    if (WebSiteUrl == @"invalid" && WebParsing)
                     {
                         ParserErrorCode = ParserErrorCodes.InvalidWebSiteGiven;
                         LastException = null;
