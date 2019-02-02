@@ -318,6 +318,7 @@ namespace Parser
             RegexList = null;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Constructor with URL and RegExList
         /// </summary>
@@ -758,6 +759,10 @@ namespace Parser
             {
                 lock (_thisLockStarting)
                 {
+                    // Reset parsing result
+                    ParsingResult?.Clear();
+                    ParsingResult = null;
+
                     // Send start event to the GUI
                     ParserErrorCode = ParserErrorCodes.Starting;
                     LastException = null;
@@ -819,6 +824,9 @@ namespace Parser
         {
 #if DEBUG
             Console.WriteLine(@"State: {0} / ThreadRunning: {1} / ErrorCode: {2} / PercentOfProgress: {3}", State, ThreadRunning, parserInfoState.LastErrorCode, parserInfoState.Percentage);
+
+            if (parserInfoState.Exception != null)
+                Console.WriteLine(@"Exception: {0}", parserInfoState.Exception.Message);
 #endif
             // Set state to "idle"
             if (parserInfoState.LastErrorCode == ParserErrorCodes.Finished || parserInfoState.LastErrorCode < 0)
