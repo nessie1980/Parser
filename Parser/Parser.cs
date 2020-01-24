@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using Microsoft.Win32;
-using mshtml;
 
 namespace Parser
 {
@@ -26,8 +23,6 @@ namespace Parser
         private readonly object _thisLockThread = new object();
 
         private readonly WebBrowser _webBrowser = new WebBrowser();
-
-        private HtmlDocument _htmlDocument;
 
         #region Given parameters
 
@@ -1160,12 +1155,18 @@ namespace Parser
         {
             webBrowser.DocumentText = html;
             webBrowser.ScriptErrorsSuppressed = true;
-            webBrowser.Document.OpenNew(true);
 
-            var htmlDocument = webBrowser.Document;
-            htmlDocument.Write(html);
+            if (webBrowser.Document != null)
+            {
+                webBrowser.Document.OpenNew(true);
 
-            return htmlDocument;
+                var htmlDocument = webBrowser.Document;
+                htmlDocument.Write(html);
+
+                return htmlDocument;
+            }
+
+            return null;
         }
     }
 
