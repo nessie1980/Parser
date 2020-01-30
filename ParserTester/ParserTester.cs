@@ -277,7 +277,7 @@ namespace ParserTester
                             _threadFunctions.Parser.OnParserUpdate -= OnUpdate;
 
                             if (e.ParserInfoState.LastErrorCode == ParserErrorCodes.Finished
-                                && _threadFunctions.Parser.ParsingValues.DailyValuesList.Count >= 1)
+                                && e.ParserInfoState.DailyValuesList.Count >= 1)
                                 HelperFunctions.AddTestCaseResultToReport(richTextBoxResult, true);
                             else
                             {

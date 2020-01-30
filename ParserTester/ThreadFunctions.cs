@@ -98,7 +98,7 @@ namespace ParserTester
         {
             FrmParserTester = frmParserTester;
 
-            Parser = new global::Parser.Parser();
+            Parser = new Parser.Parser();
 
             var threadTestCase = new Thread(ThreadTestCases)
             {
@@ -390,11 +390,10 @@ namespace ParserTester
 
             // Set website to the Parser
             if (Uri.TryCreate(
-                $@"https://www.onvista.de/onvista/boxes/historicalquote/export.csv?notationId=37886885&dateStart=31.01.2019&interval=Y1", UriKind.Absolute, out var uriResult))
-/*                $@"https://www.onvista.de/fonds/snapshotHistoryCSV?idNotation=120540040&datetimeTzStartRange={DateTime.Now.Date.AddDays(-7).ToShortDateString()}&timeSpan=D7&codeResolution=1D", UriKind.Absolute, out var uriResult))*/
+                $@"https://www.onvista.de/fonds/snapshotHistoryCSV?idNotation=120540040&datetimeTzStartRange={DateTime.Now.Date.AddDays(-7).ToShortDateString()}&timeSpan=D7&codeResolution=1D", UriKind.Absolute, out var uriResult))
                 webSiteUrl = uriResult;
 
-            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), new List<DailyValues>());
+            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString());
 
             // Check if the parsing process has been started
             if (!Parser.StartParsing())

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -116,12 +115,7 @@ namespace Parser
         public ParsingValues ParsingValues
         {
             get => _parsingValues;
-            set
-            {
-                _parsingValues = value;
-                DailyValuesResult = value.DailyValuesList;
-                ParserInfoState.DailyValuesList = value.DailyValuesList;
-            }
+            set => _parsingValues = value;
         }
 
         #endregion Given parameters
@@ -246,15 +240,15 @@ namespace Parser
             }
         }
 
-        public List<DailyValues> DailyValuesResult
-        {
-            get => _dailyValuesResult;
-            internal set
-            {
-                _dailyValuesResult = value;
-                ParserInfoState.DailyValuesList = value;
-            }
-        }
+        //public List<DailyValues> DailyValuesResult
+        //{
+        //    get => _dailyValuesResult;
+        //    internal set
+        //    {
+        //        _dailyValuesResult = value;
+        //        ParserInfoState.DailyValuesList = value;
+        //    }
+        //}
 
         #endregion Parsing result
 
@@ -282,12 +276,11 @@ namespace Parser
             State = ParserState.Idle;
         }
 
-        /// <inheritdoc />
         /// <summary>
         /// Constructor with URL and RegExList
         /// </summary>
         /// <param name="parsingValues">Parsing values for the parsing</param>
-        public Parser( ParsingValues parsingValues) : this ()
+        public Parser( ParsingValues parsingValues)
         {
 #if _DEBUG_THREADFUNCTION
             Console.WriteLine(@"Parameter constructor");
@@ -680,9 +673,8 @@ namespace Parser
                                             }
 
                                             // Calculate the progress bar step value
-                                            var statusValueStep = (100.0f - (double)PercentOfProgress) / lines.Count;
-                                            var statusValue = (double)PercentOfProgress;
-
+                                            var stateCountValueStep = (100.0f - (double)PercentOfProgress) / lines.Count;
+                                            var stateValue = (double)PercentOfProgress;
 
                                             // Split lines into values
                                             foreach (var line in lines)
@@ -729,24 +721,21 @@ namespace Parser
                                                     iCounter++;
                                                 }
 
-                                                // Only add if the date not exists already
-                                                if (!ParsingValues.DailyValuesList.Exists(x => x.Date.ToString(CultureInfo.CurrentUICulture) == dailyValues.Date.ToString(CultureInfo.CurrentUICulture)))
-                                                {
-                                                    // Add new daily values to the list
-                                                    if (DailyValuesResult == null)
-                                                        DailyValuesResult = new List<DailyValues>();
+                                                // Check if the DailyValuesResult list is already created
+                                                if (ParserInfoState.DailyValuesList == null)
+                                                    ParserInfoState.DailyValuesList = new List<DailyValues>();
 
-                                                    DailyValuesResult.Add(dailyValues);
-                                                    DailyValuesResult.Sort();
-                                                }
+                                                // Add new daily values to the list
+                                                ParserInfoState.DailyValuesList.Add(dailyValues);
 
-                                                statusValue += statusValueStep;
+                                                // Increase state
+                                                stateValue += stateCountValueStep;
 
-                                                if (statusValue < 100)
+                                                if (stateValue < 100)
                                                 {
                                                     ParserErrorCode = ParserErrorCodes.SearchRunning;
                                                     LastException = null;
-                                                    PercentOfProgress = (int)statusValue;
+                                                    PercentOfProgress = (int)stateValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
                                             }
@@ -777,8 +766,6 @@ namespace Parser
                                             if (ThreadRunning)
                                             {
                                                 // Signal that the thread has finished
-                                                // Signal that the thread has finished
-                                                ParserInfoState.DailyValuesList = DailyValuesResult;
                                                 ParserErrorCode = ParserErrorCodes.Finished;
                                                 LastException = null;
                                                 PercentOfProgress = 100;
@@ -1065,11 +1052,6 @@ namespace Parser
         /// </summary>
         public RegExList RegexList { get; internal set; }
 
-        /// <summary>
-        /// Already existing daily values
-        /// </summary>
-        public List<DailyValues> DailyValuesList { get; set; }
-
         #endregion Properties
 
         /// <summary>
@@ -1085,7 +1067,6 @@ namespace Parser
             ParsingText = parsingText;
             EncodingType = encoding;
             RegexList = regexList;
-            DailyValuesList = null;
         }
 
         /// <summary>
@@ -1101,7 +1082,6 @@ namespace Parser
             ParsingText = null;
             EncodingType = encoding;
             RegexList = regexList;
-            DailyValuesList = null;
         }
 
         /// <summary>
@@ -1109,15 +1089,13 @@ namespace Parser
         /// </summary>
         /// <param name="webSiteUrl">URL from where the text which should be parsed should be loaded</param>
         /// <param name="encoding">Encoding of the URL website</param>
-        /// <param name="dailyValuesList">Daily values which already had been loaded</param>
-        public ParsingValues(Uri webSiteUrl, string encoding, List<DailyValues> dailyValuesList)
+        public ParsingValues(Uri webSiteUrl, string encoding)
         {
             ParsingType = ParsingType.DailyValuesParing;
             WebSiteUrl = webSiteUrl;
             ParsingText = null;
             EncodingType = encoding;
             RegexList = null;
-            DailyValuesList = dailyValuesList;
         }
     }
 
@@ -1243,6 +1221,14 @@ namespace Parser
         public Exception Exception { get; internal set; }
 
         #endregion Properties
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ParserInfoState()
+        {
+            DailyValuesList = new List<DailyValues>();
+        }
     }
 
     /// <inheritdoc />
