@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace Parser
 {
@@ -22,36 +22,15 @@ namespace Parser
         private readonly object _thisLockStarting = new object();
         private readonly object _thisLockThread = new object();
 
-        private readonly WebBrowser _webBrowser = new WebBrowser();
-
-        #region Given parameters
-
-        /// <summary>
-        /// List with the parsing values variables
-        /// </summary>
-        private List<ParsingValues> _parsingValuesList;
-
-        /// <summary>
-        /// String for the website url which should be parsed
-        /// </summary>
-        private Uri _webSiteUrl;
-
-        /// <summary>
-        /// List with the regex string for the parsing
-        /// </summary>
-        private RegExList _regexList;
-
-        /// <summary>
-        /// List with the daily values list
-        /// </summary>
-        private List<DailyValues> _dailyValuesList;
-
-        #endregion Given parameters
-
         /// <summary>
         /// User agent identifier with the default value
         /// </summary>
         private string _userAgentIdentifier = @"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0";
+
+        /// <summary>
+        /// Parsing values for the parser
+        /// </summary>
+        private ParsingValues _parsingValues;
 
         #region Parser states and values
 
@@ -89,7 +68,12 @@ namespace Parser
         /// Key is the regex string
         /// Value is the search result of the regex
         /// </summary>
-        private Dictionary<string, List<string>> _parsingResult;
+        private Dictionary<string, List<string>> _marketValuesResult;
+
+        /// <summary>
+        /// List with the search result
+        /// </summary>
+        private List<DailyValues> _dailyValuesResult;
 
         #endregion Parsing result
 
@@ -111,96 +95,6 @@ namespace Parser
 
         #endregion Thread
 
-        #region Given parameters
-
-        /// <summary>
-        /// Type for the parsing
-        /// WebParsing: A given url will be loaded and the website content will be parsed by the given regex list
-        /// TextParsing: A given text will be parsed by the given regex list
-        /// DailyValuesParing: A given url will be loaded and the website content will be parsed for the daily values
-        /// </summary>
-        public ParsingType ParingType { get; set; }
-
-        /// <summary>
-        /// List for the already loaded parsing values and the new parsed daily values
-        /// </summary>
-        public List <ParsingValues> ParsingValuesList
-        {
-            get => _parsingValuesList;
-            set => _parsingValuesList = value;
-        }
-
-        /// <summary>
-        /// List with the daily values list
-        /// </summary>
-        public List<DailyValues> DailyValuesList
-        {
-            get => _dailyValuesList;
-            set => _dailyValuesList = value;
-        }
-
-        /// <summary>
-        /// Uri for the website url which should be parsed
-        /// </summary>
-        public Uri WebSiteUrl
-        {
-            get => _webSiteUrl;
-            set
-            {
-                try
-                {
-                    // Check if the website url is valid
-                    //                String regexPattern = @"^http\://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(/\S*)?$";
-                    //                if (System.Text.RegularExpressions.Regex.IsMatch(value, regexPattern))
-                    if (value.ToString() != @"")
-                    {
-                        var uriWebSite = value;
-                        var uriHostNameType = uriWebSite.HostNameType;
-                        //var strDNSName = uriWebSite.DnsSafeHost;
-                        var strWebSiteScheme = uriWebSite.Scheme;
-                        var isWllFormedUriStringFlag = Uri.IsWellFormedUriString(value.ToString(), UriKind.Absolute);
-                        if (isWllFormedUriStringFlag &&
-                            (strWebSiteScheme == Uri.UriSchemeHttp || strWebSiteScheme == Uri.UriSchemeHttps) &&
-                            (uriHostNameType == UriHostNameType.Dns || uriHostNameType == UriHostNameType.IPv4 || uriHostNameType == UriHostNameType.IPv6)
-                        )
-                        {
-                            _webSiteUrl = new Uri(!Regex.IsMatch(value.ToString(), @"(http|https)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?") ? @"invalid" : value.ToString());
-                        }
-                        else
-                            _webSiteUrl = null;
-                    }
-                    else
-                        _webSiteUrl = null;
-
-                    ParserInfoState.WebSite = _webSiteUrl != null ? _webSiteUrl.ToString() : @"";
-                }
-                catch
-                {
-                    _webSiteUrl = null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// List with the regex string for the parsing
-        /// </summary>
-        public RegExList RegexList
-        {
-            get => _regexList;
-            set
-            {
-                _regexList = value;
-                ParserInfoState.RegexList = value;
-            }
-        }
-
-        /// <summary>
-        /// Encoding type for the download content
-        /// </summary>
-        public string EncodingType { get; set; }
-
-        #endregion Given parameters
-
         /// <summary>
         /// User agent identifier with the default value
         /// </summary>
@@ -213,6 +107,24 @@ namespace Parser
                 ParserInfoState.UserAgentIdentifier = value;
             }
         }
+
+        #region Given parameters
+
+        /// <summary>
+        /// The parsing values variables
+        /// </summary>
+        public ParsingValues ParsingValues
+        {
+            get => _parsingValues;
+            set
+            {
+                _parsingValues = value;
+                DailyValuesResult = value.DailyValuesList;
+                ParserInfoState.DailyValuesList = value.DailyValuesList;
+            }
+        }
+
+        #endregion Given parameters
 
         #region Parser states and values
 
@@ -326,11 +238,21 @@ namespace Parser
         /// </summary>
         public Dictionary<string, List<string>> ParsingResult
         {
-            get => _parsingResult;
+            get => _marketValuesResult;
             internal set
             {
-                _parsingResult = value;
+                _marketValuesResult = value;
                 ParserInfoState.SearchResult = value;
+            }
+        }
+
+        public List<DailyValues> DailyValuesResult
+        {
+            get => _dailyValuesResult;
+            internal set
+            {
+                _dailyValuesResult = value;
+                ParserInfoState.DailyValuesList = value;
             }
         }
 
@@ -351,9 +273,8 @@ namespace Parser
                 Name = @"Parser"
             };
 
-            threadParser.SetApartmentState(ApartmentState.STA);
+//            threadParser.SetApartmentState(ApartmentState.STA);
 
-            DailyValuesList = null;
             TextForParsing = @"";
 
             threadParser.Start();
@@ -366,62 +287,12 @@ namespace Parser
         /// Constructor with URL and RegExList
         /// </summary>
         /// <param name="parsingValues">Parsing values for the parsing</param>
-        // ReSharper disable once RedundantBaseConstructorCall
         public Parser( ParsingValues parsingValues) : this ()
         {
 #if _DEBUG_THREADFUNCTION
             Console.WriteLine(@"Parameter constructor");
 #endif
-            ParingType = parsingValues.ParsingType;
-            WebSiteUrl = new Uri(parsingValues.WebSiteUrl);
-            EncodingType = parsingValues.Encoding;
-            RegexList = parsingValues.RegexList;
-            DailyValuesList = parsingValues.DailyValuesList;
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Constructor with text and RegExList
-        /// </summary>
-        /// <param name="parsingText">Text which should be parsed</param>
-        /// <param name="regexList">Dictionary with the regex strings and the regex options for it</param>
-        /// <param name="encoding">Encoding for the download content</param>
-        // ReSharper disable once RedundantBaseConstructorCall
-        public Parser(string parsingText, RegExList regexList, string encoding) : this()
-        {
-#if _DEBUG_THREADFUNCTION
-            Console.WriteLine(@"Parameter constructor");
-#endif
-
-            ParingType = ParsingType.TextParing;
-
-            TextForParsing = parsingText;
-
-            EncodingType = encoding;
-            RegexList = regexList;
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Constructor with URL and RegExList
-        /// </summary>
-        /// <param name="webSiteUrl">URL of the website which should be loaded and parsed or the text which should be parsed</param>
-        /// <param name="dailyValuesList">List with the daily values</param>
-        /// <param name="encoding">Encoding for the download content</param>
-        // ReSharper disable once RedundantBaseConstructorCall
-        public Parser(Uri webSiteUrl, out List<DailyValues> dailyValuesList, string encoding) : this()
-        {
-#if _DEBUG_THREADFUNCTION
-            Console.WriteLine(@"Parameter constructor");
-#endif
-            dailyValuesList = new List<DailyValues>();
-
-            ParingType = ParsingType.DailyValuesParing;
-
-            WebSiteUrl = webSiteUrl;
-
-            EncodingType = encoding;
-            DailyValuesList = dailyValuesList;
+            ParsingValues = parsingValues;
         }
 
         /// <summary>
@@ -481,7 +352,7 @@ namespace Parser
                                 if (ThreadRunning)
                                 {
                                     // Check if a website content should be loaded
-                                    if (ParingType == ParsingType.WebParsing || ParingType == ParsingType.DailyValuesParing)
+                                    if (ParsingValues.ParsingType == ParsingType.WebParsing || ParsingValues.ParsingType == ParsingType.DailyValuesParing)
                                     {
                                         // Set state to loading
                                         State = ParserState.Loading;
@@ -493,36 +364,45 @@ namespace Parser
                                         // Create web client with the given or default user agent identifier.
                                         using (var client = new WebClient())
                                         {
-                                            // Browser identifier (e.g. FireFox 36)
-                                            client.Headers["User-Agent"] = UserAgentIdentifier;
-                                            // Download content as raw data
-#if _DEBUG_THREADFUNCTION
-                                            Console.WriteLine(@"WebSide: {0}", _webSiteUrl);
-#endif
-                                            WebSiteDownloadComplete = false;
-                                            client.DownloadProgressChanged += OnWebClientDownloadProgressChanged;
-                                            client.DownloadDataCompleted += OnWebClientDownloadDataWebSiteCompleted;
-                                            client.DownloadDataAsync(_webSiteUrl);
-                                            while (!WebSiteDownloadComplete)
+                                            try
                                             {
-                                                // Check if thread should be canceled
-                                                if (CancelThread)
-                                                {
 
-                                                    ParserErrorCode = ParserErrorCodes.CancelThread;
-                                                    LastException = null;
-                                                    PercentOfProgress = 0;
-                                                    SetAndSendState(ParserInfoState);
-                                                    WebSiteDownloadComplete = false;
-                                                    client.CancelAsync();
-                                                    break;
+                                                // Browser identifier (e.g. FireFox 36)
+                                                client.Headers["User-Agent"] = UserAgentIdentifier;
+                                                // Download content as raw data
+#if _DEBUG_THREADFUNCTION
+                                            Console.WriteLine(@"WebSide: {0}", ParsingValues.WebSiteUrl);
+#endif
+                                                WebSiteDownloadComplete = false;
+                                                client.DownloadProgressChanged += OnWebClientDownloadProgressChanged;
+                                                client.DownloadDataCompleted += OnWebClientDownloadDataWebSiteCompleted;
+                                                client.DownloadDataAsync(ParsingValues.WebSiteUrl);
+                                                while (!WebSiteDownloadComplete || client.IsBusy)
+                                                {
+                                                    // Check if thread should be canceled
+                                                    if (CancelThread)
+                                                    {
+
+                                                        ParserErrorCode = ParserErrorCodes.CancelThread;
+                                                        LastException = null;
+                                                        PercentOfProgress = 0;
+                                                        SetAndSendState(ParserInfoState);
+                                                        WebSiteDownloadComplete = false;
+                                                        client.CancelAsync();
+                                                        break;
+                                                    }
+
+                                                    Thread.Sleep(10);
                                                 }
 
-                                                Thread.Sleep(10);
+                                                client.DownloadProgressChanged -= OnWebClientDownloadProgressChanged;
+                                                client.DownloadDataCompleted -= OnWebClientDownloadDataWebSiteCompleted;
                                             }
-
-                                            client.DownloadProgressChanged -= OnWebClientDownloadProgressChanged;
-                                            client.DownloadDataCompleted -= OnWebClientDownloadDataWebSiteCompleted;
+                                            catch (Exception e)
+                                            {
+                                                Console.WriteLine(e);
+                                                throw;
+                                            }
                                         }
 
                                         // Set loaded web site content to parsing text
@@ -556,7 +436,7 @@ namespace Parser
 
                                     if (ThreadRunning)
                                     {
-                                        if (ParingType == ParsingType.WebParsing)
+                                        if (ParsingValues.ParsingType == ParsingType.WebParsing)
                                         {
                                             // Set state to parsing
                                             State = ParserState.Parsing;
@@ -565,14 +445,14 @@ namespace Parser
                                             PercentOfProgress = 15;
                                             SetAndSendState(ParserInfoState);
 
-                                            var statusValueStep = (100 - 15) / RegexList.RegexListDictionary.Count;
+                                            var statusValueStep = (100 - 15) / ParsingValues.RegexList.RegexListDictionary.Count;
                                             var statusValue = 15;
 #if _DEBUG_THREADFUNCTION
                                             Console.WriteLine("Parsing-Step: {0}", statusValueStep);
 #endif
 
                                             // Loop through the dictionary and fill the result in the result list
-                                            foreach (var regexExpression in RegexList.RegexListDictionary)
+                                            foreach (var regexExpression in ParsingValues.RegexList.RegexListDictionary)
                                             {
                                                 // Check if thread should be canceled
                                                 if (CancelThread)
@@ -762,11 +642,9 @@ namespace Parser
                                             }
                                         }
 
-                                        if (ParingType == ParsingType.DailyValuesParing)
+                                        if (ParsingValues.ParsingType == ParsingType.DailyValuesParing)
                                         {
-                                            var htmlDocument = GetHtmlDocument(TextForParsing, _webBrowser);
-
-                                            if (htmlDocument == null)
+                                            if (TextForParsing == @"")
                                             {
                                                 ParserErrorCode = ParserErrorCodes.ParsingFailed;
                                                 LastException = null;
@@ -775,173 +653,135 @@ namespace Parser
                                                 break;
                                             }
 
-                                            // Check if the "tbody" tag has been found
-                                            if (htmlDocument.GetElementsByTagName("tbody").Count > 0)
+                                            // Split loaded CSV into an array which contains the lines
+                                            var lines = TextForParsing.Split().ToList();
+
+                                            // Remove CSV header content
+                                            if (lines.Count > 0)
+                                                lines.RemoveAt(0);
+
+                                            // Remove empty lines
+                                            for (var i = 0; i < lines.Count; i++)
                                             {
-                                                // Set state to parsing
-                                                State = ParserState.Parsing;
-                                                ParserErrorCode = ParserErrorCodes.SearchStarted;
-                                                LastException = null;
-                                                PercentOfProgress = 15;
-                                                SetAndSendState(ParserInfoState);
+                                                if (lines[i] != @"") continue;
 
-                                                // Loop through the found tables
-                                                foreach (HtmlElement table in htmlDocument.GetElementsByTagName("tbody"))
-                                                {
-                                                    var valuesCounter = 0;
-
-                                                    // Check if the current table has childs
-                                                    if (table.All.Count > 0)
-                                                    {
-                                                        // Count the rows
-                                                        for (var index = 0; index < table.All.Count; index++)
-                                                        {
-                                                            var row = table.All[index];
-                                                            if (row.TagName == "TR")
-                                                            {
-                                                                valuesCounter++;
-                                                            }
-                                                        }
-
-                                                        var statusValueStep = (double)((100.0f - 15.0f) / valuesCounter);
-                                                        var statusValue = 15.0;
-
-                                                        // Loop through the childs
-                                                        foreach (HtmlElement row in table.All)
-                                                        {
-                                                            var iCellCounter = 0;
-                                                            var dailyValues = new DailyValues();
-
-                                                            // Check if the child is a table row
-                                                            if (row.TagName != "TR") continue;
-
-                                                            // Check if the row has eight elements
-                                                            if (row.Children.Count == 8)
-                                                            {
-                                                                foreach (HtmlElement cell in row.Children)
-                                                                {
-                                                                    switch (iCellCounter)
-                                                                    {
-                                                                        case 0:
-                                                                            dailyValues.Date = DateTime.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 3:
-                                                                            dailyValues.OpeningPrice = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 4:
-                                                                            dailyValues.Top = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 5:
-                                                                            dailyValues.Bottom = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 6:
-                                                                            dailyValues.ClosingPrice = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 7:
-                                                                            dailyValues.Volume = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                    }
-
-                                                                    iCellCounter++;
-                                                                }
-
-                                                                // Only add if the date not exists already
-                                                                if (!DailyValuesList.Exists(x => x.Date.ToString(CultureInfo.CurrentUICulture) == dailyValues.Date.ToString(CultureInfo.CurrentUICulture)))
-                                                                {
-                                                                    // Add new daily values to the list
-                                                                    DailyValuesList.Add(dailyValues);
-                                                                    DailyValuesList.Sort();
-                                                                }
-
-                                                                statusValue += statusValueStep;
-
-                                                                if (statusValue < 100)
-                                                                {
-                                                                    ParserErrorCode = ParserErrorCodes.SearchRunning;
-                                                                    LastException = null;
-                                                                    PercentOfProgress = (int)statusValue;
-                                                                    SetAndSendState(ParserInfoState);
-                                                                }
-                                                            }
-                                                            // Check if the row has six elements
-                                                            else if (row.Children.Count == 6)
-                                                            {
-                                                                foreach (HtmlElement cell in row.Children)
-                                                                {
-                                                                    switch (iCellCounter)
-                                                                    {
-                                                                        case 0:
-                                                                            dailyValues.Date = DateTime.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 1:
-                                                                            dailyValues.OpeningPrice = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 2:
-                                                                            dailyValues.Top = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 3:
-                                                                            dailyValues.Bottom = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 4:
-                                                                            dailyValues.ClosingPrice = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                        case 5:
-                                                                            dailyValues.Volume = decimal.Parse(cell.InnerText);
-                                                                            break;
-                                                                    }
-
-                                                                    iCellCounter++;
-                                                                }
-
-                                                                // Only add if the date not exists already
-                                                                if (!DailyValuesList.Exists(x => x.Date.ToString(CultureInfo.CurrentUICulture) == dailyValues.Date.ToString(CultureInfo.CurrentUICulture)))
-                                                                {
-                                                                    // Add new daily values to the list
-                                                                    DailyValuesList.Add(dailyValues);
-                                                                    DailyValuesList.Sort();
-                                                                }
-
-                                                                statusValue += statusValueStep;
-
-                                                                if (statusValue < 100)
-                                                                {
-                                                                    ParserErrorCode = ParserErrorCodes.SearchRunning;
-                                                                    LastException = null;
-                                                                    PercentOfProgress = (int)statusValue;
-                                                                    SetAndSendState(ParserInfoState);
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                ParserErrorCode = ParserErrorCodes.ParsingFailed;
-                                                                LastException = null;
-                                                                PercentOfProgress = 0;
-                                                                SetAndSendState(ParserInfoState);
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        ParserErrorCode = ParserErrorCodes.ParsingFailed;
-                                                        LastException = null;
-                                                        PercentOfProgress = 0;
-                                                        SetAndSendState(ParserInfoState);
-                                                        break;
-                                                    }
-                                                }
-
-                                                // Signal that the thread has finished
-                                                ParserErrorCode = ParserErrorCodes.Finished;
-                                                LastException = null;
-                                                PercentOfProgress = 100;
-                                                SetAndSendState(ParserInfoState);
+                                                lines.RemoveAt(i);
+                                                i--;
                                             }
-                                            else
+
+                                            // Check if the content contains lines
+                                            if (lines.Count == 0)
                                             {
                                                 ParserErrorCode = ParserErrorCodes.ParsingFailed;
                                                 LastException = null;
                                                 PercentOfProgress = 0;
+                                                SetAndSendState(ParserInfoState);
+                                                break;
+                                            }
+
+                                            // Calculate the progress bar step value
+                                            var statusValueStep = (100.0f - (double)PercentOfProgress) / lines.Count;
+                                            var statusValue = (double)PercentOfProgress;
+
+
+                                            // Split lines into values
+                                            foreach (var line in lines)
+                                            {
+                                                var values = line.Split(';');
+
+                                                if(values.Length != 6)
+                                                {
+                                                    ParserErrorCode = ParserErrorCodes.ParsingFailed;
+                                                    LastException = null;
+                                                    PercentOfProgress = 0;
+                                                    SetAndSendState(ParserInfoState);
+                                                    break;
+                                                }
+
+                                                var iCounter = 0;
+                                                var dailyValues = new DailyValues();
+
+                                                // Set values to the daily values object
+                                                foreach (var value in values)
+                                                {
+                                                    switch (iCounter)
+                                                    {
+                                                        case 0:
+                                                            dailyValues.Date = DateTime.Parse(value);
+                                                            break;
+                                                        case 1:
+                                                            dailyValues.OpeningPrice = decimal.Parse(value);
+                                                            break;
+                                                        case 2:
+                                                            dailyValues.Top = decimal.Parse(value);
+                                                            break;
+                                                        case 3:
+                                                            dailyValues.Bottom = decimal.Parse(value);
+                                                            break;
+                                                        case 4:
+                                                            dailyValues.ClosingPrice = decimal.Parse(value);
+                                                            break;
+                                                        case 5:
+                                                            dailyValues.Volume = decimal.Parse(value);
+                                                            break;
+                                                    }
+
+                                                    iCounter++;
+                                                }
+
+                                                // Only add if the date not exists already
+                                                if (!ParsingValues.DailyValuesList.Exists(x => x.Date.ToString(CultureInfo.CurrentUICulture) == dailyValues.Date.ToString(CultureInfo.CurrentUICulture)))
+                                                {
+                                                    // Add new daily values to the list
+                                                    if (DailyValuesResult == null)
+                                                        DailyValuesResult = new List<DailyValues>();
+
+                                                    DailyValuesResult.Add(dailyValues);
+                                                    DailyValuesResult.Sort();
+                                                }
+
+                                                statusValue += statusValueStep;
+
+                                                if (statusValue < 100)
+                                                {
+                                                    ParserErrorCode = ParserErrorCodes.SearchRunning;
+                                                    LastException = null;
+                                                    PercentOfProgress = (int)statusValue;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+                                            }
+
+                                            // Get time to press "Cancel"
+                                            Thread.Sleep(100);
+
+                                            if (ThreadRunning)
+                                            {
+                                                ParserErrorCode = ParserErrorCodes.SearchFinished;
+                                                LastException = null;
+                                                PercentOfProgress = 100;
+                                                SetAndSendState(ParserInfoState);
+                                            }
+
+                                            // Check if thread should be canceled
+                                            if (CancelThread)
+                                            {
+                                                ParserErrorCode = ParserErrorCodes.CancelThread;
+                                                LastException = null;
+                                                PercentOfProgress = 0;
+                                                SetAndSendState(ParserInfoState);
+                                            }
+
+                                            // Get time to press "Cancel"
+                                            Thread.Sleep(100);
+
+                                            if (ThreadRunning)
+                                            {
+                                                // Signal that the thread has finished
+                                                // Signal that the thread has finished
+                                                ParserInfoState.DailyValuesList = DailyValuesResult;
+                                                ParserErrorCode = ParserErrorCodes.Finished;
+                                                LastException = null;
+                                                PercentOfProgress = 100;
                                                 SetAndSendState(ParserInfoState);
                                             }
                                         }
@@ -1072,7 +912,7 @@ namespace Parser
                     }
 
                     // Check if the given web address is not invalid and a web parsing should be done
-                    if (WebSiteUrl == null && (ParingType == ParsingType.WebParsing || ParingType == ParsingType.DailyValuesParing))
+                    if (ParsingValues.WebSiteUrl == null && (ParsingValues.ParsingType == ParsingType.WebParsing || ParsingValues.ParsingType == ParsingType.DailyValuesParing))
                     {
                         ParserErrorCode = ParserErrorCodes.InvalidWebSiteGiven;
                         LastException = null;
@@ -1081,7 +921,7 @@ namespace Parser
                         return false;
                     }
 
-                    if ((RegexList == null || RegexList.RegexListDictionary.Count == 0) && ParingType == ParsingType.WebParsing)
+                    if ((ParsingValues.RegexList == null || ParsingValues.RegexList.RegexListDictionary.Count == 0) && ParsingValues.ParsingType == ParsingType.WebParsing)
                     {
                         ParserErrorCode = ParserErrorCodes.NoRegexListGiven;
                         LastException = null;
@@ -1128,11 +968,8 @@ namespace Parser
             }
 
             // Send state
-            if (OnParserUpdate != null)
-            {
-                //if (ThreadRunning)
-                    OnParserUpdate(this, new OnParserUpdateEventArgs(parserInfoState));
-            }
+            //if (ThreadRunning)
+            OnParserUpdate?.Invoke(this, new OnParserUpdateEventArgs(parserInfoState));
 
             // Stop thread
             if (parserInfoState.LastErrorCode == ParserErrorCodes.Finished || parserInfoState.LastErrorCode < 0)
@@ -1150,34 +987,90 @@ namespace Parser
         public event ParserUpdateEventHandler OnParserUpdate;
 
         #endregion Events / Delegates
-
-        private static HtmlDocument GetHtmlDocument(string html, WebBrowser webBrowser)
-        {
-            webBrowser.DocumentText = html;
-            webBrowser.ScriptErrorsSuppressed = true;
-
-            if (webBrowser.Document != null)
-            {
-                webBrowser.Document.OpenNew(true);
-
-                var htmlDocument = webBrowser.Document;
-                htmlDocument.Write(html);
-
-                return htmlDocument;
-            }
-
-            return null;
-        }
     }
 
     public class ParsingValues
-    { 
-        internal ParsingType ParsingType { get; set; }
-        internal string WebSiteUrl { get; set; }
-        internal string ParsingText { get; set; }
-        internal string Encoding { get; set; }
-        internal RegExList RegexList { get; set; }
-        internal List<DailyValues> DailyValuesList { get; set; }
+    {
+        #region Given parameters
+
+        /// <summary>
+        /// String for the website url which should be parsed
+        /// </summary>
+        private Uri _webSiteUrl;
+
+        #endregion Given parameters
+
+        #region Properties
+
+        /// <summary>
+        /// Type for the parsing
+        /// WebParsing: A given url will be loaded and the website content will be parsed by the given regex list
+        /// TextParsing: A given text will be parsed by the given regex list
+        /// DailyValuesParing: A given url will be loaded and the website content will be parsed for the daily values
+        /// </summary>
+        public ParsingType ParsingType { get; set; }
+
+        /// <summary>
+        /// Encoding type for the download content
+        /// </summary>
+        public string EncodingType { get; internal set; }
+
+        /// <summary>
+        /// Uri for the website url which should be parsed
+        /// </summary>
+        public Uri WebSiteUrl
+        {
+            get => _webSiteUrl;
+            internal set
+            {
+                try
+                {
+                    // Check if the website url is valid
+                    //                String regexPattern = @"^http\://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(/\S*)?$";
+                    //                if (System.Text.RegularExpressions.Regex.IsMatch(value, regexPattern))
+                    if (value.ToString() != @"")
+                    {
+                        var uriWebSite = value;
+                        var uriHostNameType = uriWebSite.HostNameType;
+                        //var strDNSName = uriWebSite.DnsSafeHost;
+                        var strWebSiteScheme = uriWebSite.Scheme;
+                        var isWllFormedUriStringFlag = Uri.IsWellFormedUriString(value.ToString(), UriKind.Absolute);
+                        if (isWllFormedUriStringFlag &&
+                            (strWebSiteScheme == Uri.UriSchemeHttp || strWebSiteScheme == Uri.UriSchemeHttps) &&
+                            (uriHostNameType == UriHostNameType.Dns || uriHostNameType == UriHostNameType.IPv4 || uriHostNameType == UriHostNameType.IPv6)
+                        )
+                        {
+                            _webSiteUrl = new Uri(!Regex.IsMatch(value.ToString(), @"(http|https)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?") ? @"invalid" : value.ToString());
+                        }
+                        else
+                            _webSiteUrl = null;
+                    }
+                    else
+                        _webSiteUrl = null;
+                }
+                catch
+                {
+                    _webSiteUrl = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// String for the parsing
+        /// </summary>
+        public string ParsingText { get; set; }
+
+        /// <summary>
+        /// List with the regex string for the parsing
+        /// </summary>
+        public RegExList RegexList { get; internal set; }
+
+        /// <summary>
+        /// Already existing daily values
+        /// </summary>
+        public List<DailyValues> DailyValuesList { get; set; }
+
+        #endregion Properties
 
         /// <summary>
         /// Parsing values with a text which should be parsed
@@ -1190,7 +1083,7 @@ namespace Parser
             ParsingType = ParsingType.TextParing;
             WebSiteUrl = null;
             ParsingText = parsingText;
-            Encoding = encoding;
+            EncodingType = encoding;
             RegexList = regexList;
             DailyValuesList = null;
         }
@@ -1204,9 +1097,9 @@ namespace Parser
         public ParsingValues(Uri webSiteUrl, string encoding, RegExList regexList)
         {
             ParsingType = ParsingType.WebParsing;
-            WebSiteUrl = webSiteUrl.ToString();
+            WebSiteUrl = webSiteUrl;
             ParsingText = null;
-            Encoding = encoding;
+            EncodingType = encoding;
             RegexList = regexList;
             DailyValuesList = null;
         }
@@ -1217,12 +1110,12 @@ namespace Parser
         /// <param name="webSiteUrl">URL from where the text which should be parsed should be loaded</param>
         /// <param name="encoding">Encoding of the URL website</param>
         /// <param name="dailyValuesList">Daily values which already had been loaded</param>
-        public ParsingValues(string webSiteUrl, string encoding, List<DailyValues> dailyValuesList)
+        public ParsingValues(Uri webSiteUrl, string encoding, List<DailyValues> dailyValuesList)
         {
             ParsingType = ParsingType.DailyValuesParing;
             WebSiteUrl = webSiteUrl;
             ParsingText = null;
-            Encoding = encoding;
+            EncodingType = encoding;
             RegexList = null;
             DailyValuesList = dailyValuesList;
         }
@@ -1338,6 +1231,11 @@ namespace Parser
         /// Value is the search result of the regex
         /// </summary>
         public Dictionary<string, List<string>> SearchResult { get; internal set; }
+
+        /// <summary>
+        /// List with current search result of the Parser
+        /// </summary>
+        public List<DailyValues>DailyValuesList { get; internal set; }
 
         /// <summary>
         /// Exception if an exception occurred

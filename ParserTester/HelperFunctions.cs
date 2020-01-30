@@ -52,9 +52,8 @@ namespace ParserTester
                 richTextBoxResult.AppendText(e.ParserInfoState.LastErrorCode < 0 ? "Error:\t" : "Status:\t");
 
                 richTextBoxResult.AppendText(
-                    string.Format("{0} ({1} %){2}",
-                    e.ParserInfoState.LastErrorCode.ToString(), e.ParserInfoState.Percentage.ToString(), Environment.NewLine, Environment.NewLine)
-                    );
+                    $"{e.ParserInfoState.LastErrorCode.ToString()} ({e.ParserInfoState.Percentage.ToString()} %){Environment.NewLine}"
+                );
             }
             else
             {
@@ -131,7 +130,7 @@ namespace ParserTester
         {
             richTextBoxResult.AppendText($"{Environment.NewLine}Test process: ");
             richTextBoxResult.SelectionColor = Color.Red;
-            richTextBoxResult.AppendText("CANELLED");
+            richTextBoxResult.AppendText("CANCELED");
         }
     }
 }

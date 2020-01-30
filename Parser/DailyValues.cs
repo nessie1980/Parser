@@ -39,7 +39,7 @@ namespace Parser
         public decimal Volume { get; set; }
         public const string VolumeName = "Volume";
 
-        // Default comparer for DailiyValues type.
+        // Default comparer for DailyValues type.
         public int CompareTo(DailyValues dailyValue)
         {
             // A null value means that this object is greater.

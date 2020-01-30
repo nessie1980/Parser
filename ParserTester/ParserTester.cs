@@ -13,8 +13,6 @@ namespace ParserTester
         /// </summary>
         private readonly ThreadFunctions _threadFunctions;
 
-        public ThreadFunctions.UpdateGuiEventHandler OnUpdateGuiEvent { get; }
-
         /// <summary>
         /// Global flag for the test result
         /// This flag must be set if any test case failed
@@ -28,9 +26,8 @@ namespace ParserTester
 
         #region Methodes
 
-        public FrmParserTester(/*ThreadFunctions.UpdateGuiEventHandler onUpdateGuiEvent*/)
+        public FrmParserTester()
         {
-            //OnUpdateGuiEvent = onUpdateGuiEvent;
             InitializeComponent();
 
             _threadFunctions = new ThreadFunctions(this);
@@ -280,7 +277,7 @@ namespace ParserTester
                             _threadFunctions.Parser.OnParserUpdate -= OnUpdate;
 
                             if (e.ParserInfoState.LastErrorCode == ParserErrorCodes.Finished
-                                && _threadFunctions.Parser.DailyValuesList.Count >= 1)
+                                && _threadFunctions.Parser.ParsingValues.DailyValuesList.Count >= 1)
                                 HelperFunctions.AddTestCaseResultToReport(richTextBoxResult, true);
                             else
                             {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Parser;
-using Parser = Parser.Parser;
 
 namespace ParserTester
 {
@@ -25,6 +25,11 @@ namespace ParserTester
             ProcessFinish = 5,
             ProcessCancel = 6
         };
+
+        /// <summary>
+        /// Flag if the test process should be stopped
+        /// </summary>
+        private bool _cancelFlag;
 
         #endregion Variables
 
@@ -58,7 +63,16 @@ namespace ParserTester
         /// <summary>
         /// Global flag for stopping the test process
         /// </summary>
-        public bool CancelFlag { set; get; }
+        public bool CancelFlag
+        {
+            set
+            {
+                _cancelFlag = value;
+                if (Parser != null)
+                    Parser.CancelThread = value;
+            }
+            get => _cancelFlag;
+        }
 
         /// <summary>
         /// Global flag for signal that the test process has been finished
@@ -217,23 +231,22 @@ namespace ParserTester
         /// </summary>
         private void CheckParserStillWorking()
         {
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
             // Add start entry to report
             OnUpdateGuiEvent?.Invoke(this, new GuiUpdateEventArgs(GuiUpdateState.TestCaseStart, new List<string> { System.Reflection.MethodBase.GetCurrentMethod().Name }));
 
             // Set website to Parser
             if (Uri.TryCreate(@"http://www.google.com", UriKind.Absolute, out var uriResult))
-                Parser.WebSiteUrl = uriResult;
-
-            // Set parsing type
-            Parser.ParingType = ParsingType.WebParsing;
+                webSiteUrl = uriResult;
 
             // Create RegexList
             var regexList = new RegExList(@"FirstRegex", new RegexElement(@"RegexString1", 1, true, new List<RegexOptions>() { RegexOptions.None }));
             regexList.Add(@"SecondRegex", new RegexElement(@"RegexString2", 1, false, new List<RegexOptions>() { RegexOptions.Singleline, RegexOptions.IgnoreCase }));
             
-            // Set regex list to Parser
-            Parser.RegexList = regexList;
-            
+            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), regexList);
+
             // Start parsing
             Parser.StartParsing();
         }
@@ -243,15 +256,17 @@ namespace ParserTester
         /// </summary>
         private void CheckParserUrlGiven()
         {
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
             // Add start entry to report
             OnUpdateGuiEvent?.Invoke(this, new GuiUpdateEventArgs(GuiUpdateState.TestCaseStart, new List<string> { System.Reflection.MethodBase.GetCurrentMethod().Name }));
 
             // Set website to a empty string;
             if (!Uri.TryCreate(@"", UriKind.Absolute, out var uriResult))
-                Parser.WebSiteUrl = uriResult;
+                webSiteUrl = uriResult;
 
-            // Set parsing type
-            Parser.ParingType = ParsingType.WebParsing;
+            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), new RegExList());
 
             // Check if the parsing process has been started
             if (!Parser.StartParsing())
@@ -265,18 +280,17 @@ namespace ParserTester
         /// </summary>
         private void CheckParserRegexListGiven()
         {
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
             // Add start entry to report
             OnUpdateGuiEvent?.Invoke(this, new GuiUpdateEventArgs(GuiUpdateState.TestCaseStart, new List<string> { System.Reflection.MethodBase.GetCurrentMethod().Name }));
 
             // Set website to the Parser
             if (Uri.TryCreate(@"http://www.google.com", UriKind.Absolute, out var uriResult))
-                Parser.WebSiteUrl = uriResult;
+                webSiteUrl = uriResult;
 
-            // Set parsing type
-            Parser.ParingType = ParsingType.WebParsing;
-
-            // Set regex list to null in the Parser
-            Parser.RegexList = null;
+            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), new RegExList());
 
             // Check if the parsing process has been started
             if (!Parser.StartParsing())
@@ -290,18 +304,17 @@ namespace ParserTester
         /// </summary>
         private void CheckParserInvalidUrlGiven()
         {
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
             // Add start entry to report
             OnUpdateGuiEvent?.Invoke(this, new GuiUpdateEventArgs(GuiUpdateState.TestCaseStart, new List<string> { System.Reflection.MethodBase.GetCurrentMethod().Name }));
 
             // Set website to the Parser
             if (Uri.TryCreate(@"htt://www.google.com", UriKind.Absolute, out var uriResult))
-                Parser.WebSiteUrl = uriResult;
+                webSiteUrl = uriResult;
 
-            // Set parsing type
-            Parser.ParingType = ParsingType.WebParsing;
-
-            // Set regex list to null in the Parser
-            Parser.RegexList = null;
+            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), new RegExList());
 
             // Check if the parsing process has been started
             if (!Parser.StartParsing())
@@ -315,20 +328,20 @@ namespace ParserTester
         /// </summary>
         private void CheckParserError()
         {
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
             // Add start entry to report
             OnUpdateGuiEvent?.Invoke(this, new GuiUpdateEventArgs(GuiUpdateState.TestCaseStart, new List<string> { System.Reflection.MethodBase.GetCurrentMethod().Name }));
 
             // Set website to the Parser
             if (Uri.TryCreate(@"http://tbarth.eu/sunnyconnectoranalyzer", UriKind.Absolute, out var uriResult))
-                Parser.WebSiteUrl = uriResult;
-
-            // Set parsing type
-            Parser.ParingType = ParsingType.WebParsing;
+                webSiteUrl = uriResult;
 
             // Create regex list
             var regexList = new RegExList(@"Gesamt", new RegexElement(@">Gsamt-(.*?)<", 0, false, new List<RegexOptions>() { RegexOptions.None }));
-            // Set regex list to Parser
-            Parser.RegexList = regexList;
+            
+            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), regexList);
 
             // Check if the parsing process has been started
             if (!Parser.StartParsing())
@@ -342,21 +355,20 @@ namespace ParserTester
         /// </summary>
         private void CheckParserWebParsingSuccessful()
         {
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
             // Add start entry to report
             OnUpdateGuiEvent?.Invoke(this, new GuiUpdateEventArgs(GuiUpdateState.TestCaseStart, new List<string> { System.Reflection.MethodBase.GetCurrentMethod().Name }));
 
             // Set website to the Parser
             if (Uri.TryCreate(@"http://tbarth.eu/sunnyconnectoranalyzer", UriKind.Absolute, out var uriResult))
-                Parser.WebSiteUrl = uriResult;
-
-            // Set parsing type
-            Parser.ParingType = ParsingType.WebParsing;
+                webSiteUrl = uriResult;
 
             // Create regex list
             var regexList = new RegExList(@"Gesamt", new RegexElement(@">Gesamt-(.*?)<", -1, false, new List<RegexOptions>() { RegexOptions.None }));
 
-            // Set regex list to Parser
-            Parser.RegexList = regexList;
+            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), regexList);
 
             // Check if the parsing process has been started
             if (!Parser.StartParsing())
@@ -370,25 +382,19 @@ namespace ParserTester
         /// </summary>
         private void CheckParserDailyValuesSuccessful()
         {
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
             // Add start entry to report
             OnUpdateGuiEvent?.Invoke(this, new GuiUpdateEventArgs(GuiUpdateState.TestCaseStart, new List<string> { System.Reflection.MethodBase.GetCurrentMethod().Name }));
 
-            // Set parsing type
-            Parser.ParingType = ParsingType.DailyValuesParing;
-
             // Set website to the Parser
             if (Uri.TryCreate(
-                $@"https://www.onvista.de/onvista/times+sales/popup/historische-kurse/?notationId=39517324&dateStart={DateTime.Now.Date.AddDays(-7).ToShortDateString()}&interval=D7&assetName=Adidas&exchange=Tradegate", UriKind.Absolute, out var uriResult))
-                Parser.WebSiteUrl = uriResult;
+                $@"https://www.onvista.de/onvista/boxes/historicalquote/export.csv?notationId=37886885&dateStart=31.01.2019&interval=Y1", UriKind.Absolute, out var uriResult))
+/*                $@"https://www.onvista.de/fonds/snapshotHistoryCSV?idNotation=120540040&datetimeTzStartRange={DateTime.Now.Date.AddDays(-7).ToShortDateString()}&timeSpan=D7&codeResolution=1D", UriKind.Absolute, out var uriResult))*/
+                webSiteUrl = uriResult;
 
-            // Set regex list to Parser
-            Parser.RegexList = null;
-
-            // Daily values list
-            var dailyValuesList = new List<DailyValues>();
-
-            // Set daily values list
-            Parser.DailyValuesList = dailyValuesList;
+            Parser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), new List<DailyValues>());
 
             // Check if the parsing process has been started
             if (!Parser.StartParsing())
@@ -403,11 +409,6 @@ namespace ParserTester
         /// </summary>
         public class GuiUpdateEventArgs : EventArgs
         {
-
-            #region Variables
-
-            #endregion Variables
-
             #region Properties
 
             public GuiUpdateState State { get; }
