@@ -69,11 +69,6 @@ namespace Parser
         /// </summary>
         private Dictionary<string, List<string>> _marketValuesResult;
 
-        /// <summary>
-        /// List with the search result
-        /// </summary>
-        private List<DailyValues> _dailyValuesResult;
-
         #endregion Parsing result
 
         #endregion Variables
@@ -267,8 +262,6 @@ namespace Parser
                 Name = @"Parser"
             };
 
-//            threadParser.SetApartmentState(ApartmentState.STA);
-
             TextForParsing = @"";
 
             threadParser.Start();
@@ -345,7 +338,7 @@ namespace Parser
                                 if (ThreadRunning)
                                 {
                                     // Check if a website content should be loaded
-                                    if (ParsingValues.ParsingType == ParsingType.WebParsing || ParsingValues.ParsingType == ParsingType.DailyValuesParing)
+                                    if (ParsingValues.ParsingType == ParsingType.WebParsing || ParsingValues.ParsingType == ParsingType.DailyValuesParsing)
                                     {
                                         // Set state to loading
                                         State = ParserState.Loading;
@@ -427,9 +420,16 @@ namespace Parser
                                         }
                                     }
 
+                                    // Set given parsing text to the parser variable
+                                    if (ParsingValues.ParsingType == ParsingType.TextParsing)
+                                    {
+                                        TextForParsing = ParsingValues.ParsingText;
+                                    }
+
                                     if (ThreadRunning)
                                     {
-                                        if (ParsingValues.ParsingType == ParsingType.WebParsing)
+                                        // Do website or text parsing
+                                        if (ParsingValues.ParsingType == ParsingType.WebParsing || ParsingValues.ParsingType == ParsingType.TextParsing)
                                         {
                                             // Set state to parsing
                                             State = ParserState.Parsing;
@@ -635,7 +635,7 @@ namespace Parser
                                             }
                                         }
 
-                                        if (ParsingValues.ParsingType == ParsingType.DailyValuesParing)
+                                        if (ParsingValues.ParsingType == ParsingType.DailyValuesParsing)
                                         {
                                             if (TextForParsing == @"")
                                             {
@@ -879,8 +879,18 @@ namespace Parser
                 lock (_thisLockStarting)
                 {
                     // Reset parsing result
-                    ParsingResult?.Clear();
-                    ParsingResult = null;
+                    if (ParsingResult != null)
+                    {
+                        ParsingResult?.Clear();
+                        ParsingResult = null;
+                    }
+
+                    // Reset daily values list result
+                    if (ParserInfoState?.DailyValuesList != null)
+                    {
+                        ParserInfoState.DailyValuesList.Clear();
+                        ParserInfoState.DailyValuesList = null;
+                    }
 
                     // Send start event to the GUI
                     ParserErrorCode = ParserErrorCodes.Starting;
@@ -899,7 +909,7 @@ namespace Parser
                     }
 
                     // Check if the given web address is not invalid and a web parsing should be done
-                    if (ParsingValues.WebSiteUrl == null && (ParsingValues.ParsingType == ParsingType.WebParsing || ParsingValues.ParsingType == ParsingType.DailyValuesParing))
+                    if (ParsingValues.WebSiteUrl == null && (ParsingValues.ParsingType == ParsingType.WebParsing || ParsingValues.ParsingType == ParsingType.DailyValuesParsing))
                     {
                         ParserErrorCode = ParserErrorCodes.InvalidWebSiteGiven;
                         LastException = null;
@@ -1062,7 +1072,7 @@ namespace Parser
         /// <param name="regexList">Regex list for the parsing</param>
         public ParsingValues(string parsingText, string encoding, RegExList regexList)
         {
-            ParsingType = ParsingType.TextParing;
+            ParsingType = ParsingType.TextParsing;
             WebSiteUrl = null;
             ParsingText = parsingText;
             EncodingType = encoding;
@@ -1091,7 +1101,7 @@ namespace Parser
         /// <param name="encoding">Encoding of the URL website</param>
         public ParsingValues(Uri webSiteUrl, string encoding)
         {
-            ParsingType = ParsingType.DailyValuesParing;
+            ParsingType = ParsingType.DailyValuesParsing;
             WebSiteUrl = webSiteUrl;
             ParsingText = null;
             EncodingType = encoding;
@@ -1105,8 +1115,8 @@ namespace Parser
     public enum ParsingType
     {
         WebParsing,
-        TextParing,
-        DailyValuesParing
+        TextParsing,
+        DailyValuesParsing
     };
 
     /// <summary>

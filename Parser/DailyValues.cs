@@ -24,7 +24,7 @@ using System;
 
 namespace Parser
 {
-    public class DailyValues : IComparable<DailyValues>
+    public class DailyValues : IComparable<DailyValues>, IEquatable<DailyValues>
     {
         public DateTime Date { get; set; }
         public const string DateName = "Date";
@@ -45,5 +45,16 @@ namespace Parser
             // A null value means that this object is greater.
             return dailyValue == null ? 1 : Date.CompareTo(dailyValue.Date);
         }
+
+        public bool Equals(DailyValues objectValue)
+        {
+            if (objectValue is null)
+                return false;
+
+            return Date == objectValue.Date;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as DailyValues);
+        public override int GetHashCode() => (Date).GetHashCode();
     }
 }
