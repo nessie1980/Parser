@@ -69,11 +69,6 @@ namespace Parser
         /// </summary>
         private Dictionary<string, List<string>> _marketValuesResult;
 
-        /// <summary>
-        /// List with the search result
-        /// </summary>
-        private List<DailyValues> _dailyValuesResult;
-
         #endregion Parsing result
 
         #endregion Variables
@@ -266,8 +261,6 @@ namespace Parser
                 IsBackground = true,
                 Name = @"Parser"
             };
-
-//            threadParser.SetApartmentState(ApartmentState.STA);
 
             TextForParsing = @"";
 
@@ -879,8 +872,18 @@ namespace Parser
                 lock (_thisLockStarting)
                 {
                     // Reset parsing result
-                    ParsingResult?.Clear();
-                    ParsingResult = null;
+                    if (ParsingResult != null)
+                    {
+                        ParsingResult?.Clear();
+                        ParsingResult = null;
+                    }
+
+                    // Reset daily values list result
+                    if (ParserInfoState?.DailyValuesList != null)
+                    {
+                        ParserInfoState.DailyValuesList.Clear();
+                        ParserInfoState.DailyValuesList = null;
+                    }
 
                     // Send start event to the GUI
                     ParserErrorCode = ParserErrorCodes.Starting;
