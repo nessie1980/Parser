@@ -1025,7 +1025,7 @@ namespace Parser
                     // Check if the website url is valid
                     //                String regexPattern = @"^http\://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(/\S*)?$";
                     //                if (System.Text.RegularExpressions.Regex.IsMatch(value, regexPattern))
-                    if (value.ToString() != @"")
+                    if (value != null && value.ToString() != @"")
                     {
                         var uriWebSite = value;
                         var uriHostNameType = uriWebSite.HostNameType;
