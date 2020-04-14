@@ -42,6 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DailyValues.cs" />
+    <Compile Include="DataTypes.cs" />
+    <Compile Include="Debugging.cs" />
+    <Compile Include="ParsingValues.cs" />
     <Compile Include="Regex.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
