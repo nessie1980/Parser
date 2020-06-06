@@ -8,7 +8,7 @@ namespace Parser
         #region Given parameters
 
         /// <summary>
-        /// String for the website url which should be parsed
+        /// Uri for the website url which should be parsed
         /// </summary>
         private Uri _webSiteUrl;
 
@@ -37,6 +37,9 @@ namespace Parser
             get => _webSiteUrl;
             internal set
             {
+                // Save given website url
+                GivenWebSiteUrl = value != null ? value.ToString() : @"Nothing given";
+
                 try
                 {
                     // Check if the website url is valid
@@ -68,6 +71,12 @@ namespace Parser
                 }
             }
         }
+
+        /// <summary>
+        /// Uri for the website which is original given to the parser
+        /// Used for later usage ( e.g. logging )
+        /// </summary>
+        public string GivenWebSiteUrl { get; private set; }
 
         /// <summary>
         /// String for the parsing
