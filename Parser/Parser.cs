@@ -478,6 +478,8 @@ namespace Parser
                                         TextForParsing = ParsingValues.ParsingText;
                                     }
 
+                                    _debugger.WriteDebuggingMsg(TextForParsing);
+
                                     if (ThreadRunning)
                                     {
                                         // Do website or text parsing
