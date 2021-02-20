@@ -24,6 +24,15 @@ using System;
 
 namespace Parser
 {
+    // Intervals
+    public enum Interval
+    {
+        Week = 0,
+        Month = 1,
+        Quarter = 2,
+        Year = 3
+    }
+
     public class DailyValues : IComparable<DailyValues>, IEquatable<DailyValues>
     {
         public DateTime Date { get; set; }
