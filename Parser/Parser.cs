@@ -685,7 +685,7 @@ namespace Parser
                                         {
                                             if (TextForParsing == @"")
                                             {
-                                                ParserErrorCode = DataTypes.ParserErrorCodes.ParsingFailed;
+                                                ParserErrorCode = DataTypes.ParserErrorCodes.NoWebContentLoaded;
                                                 LastException = null;
                                                 PercentOfProgress = 0;
                                                 SetAndSendState(ParserInfoState);
@@ -711,7 +711,7 @@ namespace Parser
                                                 // Check if the content contains lines
                                                 if (lines.Count == 0)
                                                 {
-                                                    ParserErrorCode = DataTypes.ParserErrorCodes.ParsingFailed;
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.NoWebContentLoaded;
                                                     LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
