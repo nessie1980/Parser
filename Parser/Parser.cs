@@ -1,10 +1,35 @@
-﻿using System;
+﻿//MIT License
+//
+//Copyright(c) 2021 nessie1980(nessie1980 @gmx.de)
+//
+//Permission is hereby granted, free of charge, to any person obtaining a copy
+//of this software and associated documentation files (the "Software"), to deal
+//in the Software without restriction, including without limitation the rights
+//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//copies of the Software, and to permit persons to whom the Software is
+//furnished to do so, subject to the following conditions:
+//
+//The above copyright notice and this permission notice shall be included in all
+//copies or substantial portions of the Software.
+//
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//SOFTWARE.
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Newtonsoft.Json;
+using Parser.JsonObjects.OnVista;
 
 namespace Parser
 {
@@ -12,7 +37,6 @@ namespace Parser
     // ReSharper disable once UnusedMember.Global
     public class Parser
     {
-
         #region Variables
 
         /// <summary>
@@ -392,7 +416,7 @@ namespace Parser
                                 if (ThreadRunning)
                                 {
                                     // Check if a website content should be loaded
-                                    if (ParsingValues.ParsingType == DataTypes.ParsingType.WebParsing || ParsingValues.ParsingType == DataTypes.ParsingType.DailyValuesParsing)
+                                    if (ParsingValues.LoadingType == DataTypes.LoadType.Web)
                                     {
                                         // Set state to loading
                                         State = DataTypes.ParserState.Loading;
@@ -436,6 +460,11 @@ namespace Parser
                                                 client.DownloadProgressChanged -= OnWebClientDownloadProgressChanged;
                                                 client.DownloadDataCompleted -= OnWebClientDownloadDataWebSiteCompleted;
                                             }
+                                            catch (WebException webEx)
+                                            {
+                                                _debugger.WriteDebuggingMsg($@"WebException: {webEx.Message}");
+                                                throw;
+                                            }
                                             catch (Exception e)
                                             {
                                                 _debugger.WriteDebuggingMsg($@"Exception: {e.Message}");
@@ -473,7 +502,7 @@ namespace Parser
                                     }
 
                                     // Set given parsing text to the parser variable
-                                    if (ParsingValues.ParsingType == DataTypes.ParsingType.TextParsing)
+                                    if (ParsingValues.LoadingType == DataTypes.LoadType.Text)
                                     {
                                         TextForParsing = ParsingValues.ParsingText;
                                     }
@@ -482,8 +511,8 @@ namespace Parser
 
                                     if (ThreadRunning)
                                     {
-                                        // Do website or text parsing
-                                        if (ParsingValues.ParsingType == DataTypes.ParsingType.WebParsing || ParsingValues.ParsingType == DataTypes.ParsingType.TextParsing)
+                                        // Do regex parsing
+                                        if (ParsingValues.ParsingType == DataTypes.ParsingType.Regex)
                                         {
                                             // Set state to parsing
                                             State = DataTypes.ParserState.Parsing;
@@ -492,7 +521,8 @@ namespace Parser
                                             PercentOfProgress = 15;
                                             SetAndSendState(ParserInfoState);
 
-                                            var statusValueStep = (100 - 15) / ParsingValues.RegexList.RegexListDictionary.Count;
+                                            var statusValueStep = (100 - 15) /
+                                                                  ParsingValues.RegexList.RegexListDictionary.Count;
                                             var statusValue = 15;
                                             _debugger.WriteDebuggingMsg($@"Parsing-Step: {statusValueStep}");
 
@@ -515,8 +545,10 @@ namespace Parser
                                                 var regexElement = regexExpression.Value;
 
                                                 _debugger.WriteDebuggingMsg(@"");
-                                                _debugger.WriteDebuggingMsg($@"regexExpression.Key: {regexExpression.Key}");
-                                                _debugger.WriteDebuggingMsg($@"regexElement.RegexExpression: {regexElement.RegexExpression}");
+                                                _debugger.WriteDebuggingMsg(
+                                                    $@"regexExpression.Key: {regexExpression.Key}");
+                                                _debugger.WriteDebuggingMsg(
+                                                    $@"regexElement.RegexExpression: {regexElement.RegexExpression}");
 
                                                 // Build the regex options
                                                 var tmpRegexOptionsList = regexElement.RegexOptions;
@@ -531,7 +563,8 @@ namespace Parser
                                                 }
 
                                                 _debugger.WriteDebuggingMsg($@"tmpRegexOptions: {tmpRegexOptions}");
-                                                _debugger.WriteDebuggingMsg($@"regexExpression.Value.RegexExpression: {regexExpression.Value.RegexExpression}");
+                                                _debugger.WriteDebuggingMsg(
+                                                    $@"regexExpression.Value.RegexExpression: {regexExpression.Value.RegexExpression}");
 
                                                 // Search for the value
                                                 var added = false;
@@ -563,7 +596,8 @@ namespace Parser
                                                             // Check if thread should be canceled
                                                             if (CancelThread)
                                                             {
-                                                                ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                                ParserErrorCode = DataTypes.ParserErrorCodes
+                                                                    .CancelThread;
                                                                 LastException = null;
                                                                 PercentOfProgress = 0;
                                                                 SetAndSendState(ParserInfoState);
@@ -571,8 +605,8 @@ namespace Parser
 
                                                             // Check if the result is empty
                                                             if (matchCollection[
-                                                                        regexExpression.Value.RegexFoundPosition]
-                                                                    .Groups[i].Value == "") continue;
+                                                                    regexExpression.Value.RegexFoundPosition]
+                                                                .Groups[i].Value == "") continue;
 
                                                             listResults.Add(
                                                                 matchCollection[
@@ -590,7 +624,8 @@ namespace Parser
                                                             // Check if thread should be canceled
                                                             if (CancelThread)
                                                             {
-                                                                ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                                ParserErrorCode = DataTypes.ParserErrorCodes
+                                                                    .CancelThread;
                                                                 LastException = null;
                                                                 PercentOfProgress = 0;
                                                                 SetAndSendState(ParserInfoState);
@@ -598,13 +633,14 @@ namespace Parser
 
                                                             _debugger.WriteDebuggingMsg(
                                                                 $@"regexExpression.Key: {regexExpression.Key} = Value: {match.Groups[1].Value}");
-                                                            
+
                                                             for (var i = 1; i < match.Groups.Count; i++)
                                                             {
                                                                 // Check if thread should be canceled
                                                                 if (CancelThread)
                                                                 {
-                                                                    ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                                    ParserErrorCode = DataTypes.ParserErrorCodes
+                                                                        .CancelThread;
                                                                     LastException = null;
                                                                     PercentOfProgress = 0;
                                                                     SetAndSendState(ParserInfoState);
@@ -613,7 +649,6 @@ namespace Parser
                                                                 if (match.Groups[i].Value != "")
                                                                 {
                                                                     listResults.Add(match.Groups[i].Value);
-//                                                                    i = match.Groups.Count;
                                                                 }
                                                             }
                                                         }
@@ -645,7 +680,6 @@ namespace Parser
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
-
                                             }
 
                                             // Get time to press "Cancel"
@@ -681,35 +715,152 @@ namespace Parser
                                             }
                                         }
 
-                                        if (ParsingValues.ParsingType == DataTypes.ParsingType.DailyValuesParsing)
+                                        // Check if the web content could be loaded
+                                        if (TextForParsing != string.Empty)
                                         {
-                                            if (TextForParsing == @"")
+                                            // Do real time parsing via JSON
+                                            if (ParsingValues.ParsingType == DataTypes.ParsingType.OnVistaRealTime)
                                             {
-                                                ParserErrorCode = DataTypes.ParserErrorCodes.NoWebContentLoaded;
-                                                LastException = null;
-                                                PercentOfProgress = 0;
-                                                SetAndSendState(ParserInfoState);
-                                            }
-                                            else
-                                            {
-                                                // Split loaded CSV into an array which contains the lines
-                                                var lines = TextForParsing.Split().ToList();
+                                                var realTimeData =
+                                                    JsonConvert.DeserializeObject<RealTimeData>(WebSiteContentAsString,
+                                                        new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
+                                                        );
 
-                                                // Remove CSV header content
-                                                if (lines.Count > 0)
-                                                    lines.RemoveAt(0);
-
-                                                // Remove empty lines
-                                                for (var i = 0; i < lines.Count; i++)
+                                                if (ParsingResult == null)
                                                 {
-                                                    if (lines[i] != @"") continue;
-
-                                                    lines.RemoveAt(i);
-                                                    i--;
+                                                    ParsingResult = new Dictionary<string, List<string>>();
                                                 }
 
+                                                // Calculate the step interval for the progress bar
+                                                const int statusValueStep = (100 - 15) / 5;
+                                                var statusValue = 15;
+
+                                                // Map values of the real time value to the result
+                                                ParsingResult.Add("Currency", new List<string> { realTimeData.IsoCurrency });
+                                                statusValue += statusValueStep;
+
+                                                if (statusValue < 100)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
+                                                    LastException = null;
+                                                    PercentOfProgress = statusValue;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+                                                // Get time to press "Cancel"
+                                                Thread.Sleep(100);
+                                                // Check if thread should be canceled
+                                                if (CancelThread)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                    LastException = null;
+                                                    PercentOfProgress = 0;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+
+                                                ParsingResult.Add("LastDate", new List<string> { DateTime.Parse(realTimeData.DatetimePrice.LocalTime).ToShortDateString() });
+                                                statusValue += statusValueStep;
+
+                                                if (statusValue < 100)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
+                                                    LastException = null;
+                                                    PercentOfProgress = statusValue;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+                                                // Get time to press "Cancel"
+                                                Thread.Sleep(100);
+                                                // Check if thread should be canceled
+                                                if (CancelThread)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                    LastException = null;
+                                                    PercentOfProgress = 0;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+
+                                                ParsingResult.Add("LastTime", new List<string> { DateTime.Parse(realTimeData.DatetimePrice.LocalTime).ToLongTimeString() });
+                                                statusValue += statusValueStep;
+
+                                                if (statusValue < 100)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
+                                                    LastException = null;
+                                                    PercentOfProgress = statusValue;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+                                                // Get time to press "Cancel"
+                                                Thread.Sleep(100);
+                                                // Check if thread should be canceled
+                                                if (CancelThread)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                    LastException = null;
+                                                    PercentOfProgress = 0;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+
+                                                ParsingResult.Add("Price", new List<string> { realTimeData.Price.ToString(CultureInfo.CurrentCulture) });
+                                                statusValue += statusValueStep;
+
+                                                if (statusValue < 100)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
+                                                    LastException = null;
+                                                    PercentOfProgress = statusValue;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+                                                // Get time to press "Cancel"
+                                                Thread.Sleep(100);
+                                                // Check if thread should be canceled
+                                                if (CancelThread)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                    LastException = null;
+                                                    PercentOfProgress = 0;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+
+                                                ParsingResult.Add("PriceBefore", new List<string> { realTimeData.PreviousLast.ToString(CultureInfo.CurrentCulture) });
+                                                statusValue += statusValueStep;
+
+                                                if (statusValue < 100)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
+                                                    LastException = null;
+                                                    PercentOfProgress = statusValue;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+                                                // Get time to press "Cancel"
+                                                Thread.Sleep(100);
+                                                // Check if thread should be canceled
+                                                if (CancelThread)
+                                                {
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                    LastException = null;
+                                                    PercentOfProgress = 0;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+
+                                                if (ThreadRunning)
+                                                {
+                                                    // Signal that the thread has finished
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
+                                                    LastException = null;
+                                                    PercentOfProgress = 100;
+                                                    SetAndSendState(ParserInfoState);
+                                                }
+                                                // Get time to press "Cancel"
+                                                Thread.Sleep(100);
+                                            }
+
+                                            // Do daily values parsing via JSON
+                                            if (ParsingValues.ParsingType == DataTypes.ParsingType.OnVistaHistoryData)
+                                            {
+                                                var historyData =
+                                                    JsonConvert.DeserializeObject<HistoryData>(WebSiteContentAsString);
+
                                                 // Check if the content contains lines
-                                                if (lines.Count == 0)
+                                                if (historyData.First.Length == 0)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.NoWebContentLoaded;
                                                     LastException = null;
@@ -718,106 +869,104 @@ namespace Parser
                                                 }
                                                 else
                                                 {
-                                                    // Calculate the progress bar step value
-                                                    var stateCountValueStep =
-                                                        (100.0f - (double) PercentOfProgress) / lines.Count;
-                                                    var stateValue = (double) PercentOfProgress;
-
-                                                    // Split lines into values
-                                                    foreach (var line in lines)
+                                                    // Check if the necessary values are available
+                                                    if (historyData.DatetimeLast.Length == 0 ||
+                                                        historyData.First.Length == 0 ||
+                                                        historyData.Last.Length == 0 ||
+                                                        historyData.High.Length == 0 ||
+                                                        historyData.Low.Length == 0 ||
+                                                        historyData.Volume.Length == 0
+                                                    )
                                                     {
-                                                        var values = line.Split(';');
-
-                                                        if (values.Length != 6)
-                                                        {
-                                                            ParserErrorCode = DataTypes.ParserErrorCodes.ParsingFailed;
-                                                            LastException = null;
-                                                            PercentOfProgress = 0;
-                                                            SetAndSendState(ParserInfoState);
-                                                            break;
-                                                        }
-
-                                                        var iCounter = 0;
-                                                        var dailyValues = new DailyValues();
-
-                                                        // Set values to the daily values object
-                                                        foreach (var value in values)
-                                                        {
-                                                            switch (iCounter)
-                                                            {
-                                                                case 0:
-                                                                    dailyValues.Date = DateTime.Parse(value);
-                                                                    break;
-                                                                case 1:
-                                                                    dailyValues.OpeningPrice = decimal.Parse(value);
-                                                                    break;
-                                                                case 2:
-                                                                    dailyValues.Top = decimal.Parse(value);
-                                                                    break;
-                                                                case 3:
-                                                                    dailyValues.Bottom = decimal.Parse(value);
-                                                                    break;
-                                                                case 4:
-                                                                    dailyValues.ClosingPrice = decimal.Parse(value);
-                                                                    break;
-                                                                case 5:
-                                                                    dailyValues.Volume = decimal.Parse(value);
-                                                                    break;
-                                                            }
-
-                                                            iCounter++;
-                                                        }
-
-                                                        // Check if the DailyValuesResult list is already created
-                                                        if (ParserInfoState.DailyValuesList == null)
-                                                            ParserInfoState.DailyValuesList = new List<DailyValues>();
-
-                                                        // Add new daily values to the list
-                                                        ParserInfoState.DailyValuesList.Add(dailyValues);
-
-                                                        // Increase state
-                                                        stateValue += stateCountValueStep;
-
-                                                        if (stateValue < 100)
-                                                        {
-                                                            ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                            LastException = null;
-                                                            PercentOfProgress = (int) stateValue;
-                                                            SetAndSendState(ParserInfoState);
-                                                        }
-                                                    }
-
-                                                    // Get time to press "Cancel"
-                                                    Thread.Sleep(100);
-
-                                                    if (ThreadRunning)
-                                                    {
-                                                        ParserErrorCode = DataTypes.ParserErrorCodes.SearchFinished;
-                                                        LastException = null;
-                                                        PercentOfProgress = 100;
-                                                        SetAndSendState(ParserInfoState);
-                                                    }
-
-                                                    // Check if thread should be canceled
-                                                    if (CancelThread)
-                                                    {
-                                                        ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                        ParserErrorCode = DataTypes.ParserErrorCodes
+                                                            .ParsingFailed;
                                                         LastException = null;
                                                         PercentOfProgress = 0;
                                                         SetAndSendState(ParserInfoState);
                                                     }
-
-                                                    // Get time to press "Cancel"
-                                                    Thread.Sleep(100);
-
-                                                    if (ThreadRunning)
+                                                    else
                                                     {
-                                                        // Signal that the thread has finished
-                                                        ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
-                                                        LastException = null;
-                                                        PercentOfProgress = 100;
-                                                        SetAndSendState(ParserInfoState);
+                                                        // Calculate the progress bar step value
+                                                        var stateCountValueStep =
+                                                            (100.0f - (double)PercentOfProgress) / historyData.First.Length;
+                                                        var stateValue = (double)PercentOfProgress;
+
+                                                        for (var i = 0; i < historyData.DatetimeLast.Length; i++)
+                                                        {
+                                                            var dailyValues = new DailyValues
+                                                            {
+                                                                Date = DateTimeOffset
+                                                                    .FromUnixTimeSeconds(historyData.DatetimeLast[i])
+                                                                    .Date,
+                                                                OpeningPrice = decimal.Round(Convert.ToDecimal(historyData.First[i]), 2),
+                                                                ClosingPrice = decimal.Round(Convert.ToDecimal(historyData.Last[i]), 2),
+                                                                Bottom = decimal.Round(Convert.ToDecimal(historyData.Low[i]), 2),
+                                                                Top = decimal.Round(Convert.ToDecimal(historyData.High[i]), 2),
+                                                                Volume = decimal.Round(Convert.ToDecimal(historyData.Volume[i]), 2)
+                                                            };
+
+                                                            // Check if the DailyValuesResult list is already created
+                                                            if (ParserInfoState.DailyValuesList == null)
+                                                                ParserInfoState.DailyValuesList =
+                                                                    new List<DailyValues>();
+
+                                                            // Add new daily values to the list
+                                                            ParserInfoState.DailyValuesList.Add(dailyValues);
+
+                                                            // Increase state
+                                                            stateValue += stateCountValueStep;
+
+                                                            if (stateValue < 100)
+                                                            {
+                                                                ParserErrorCode = DataTypes.ParserErrorCodes
+                                                                    .SearchRunning;
+                                                                LastException = null;
+                                                                PercentOfProgress = (int)stateValue;
+                                                                SetAndSendState(ParserInfoState);
+                                                            }
+                                                        }
+
+                                                        // Get time to press "Cancel"
+                                                        Thread.Sleep(100);
+
+                                                        if (ThreadRunning)
+                                                        {
+                                                            ParserErrorCode = DataTypes.ParserErrorCodes.SearchFinished;
+                                                            LastException = null;
+                                                            PercentOfProgress = 100;
+                                                            SetAndSendState(ParserInfoState);
+                                                        }
+
+                                                        // Check if thread should be canceled
+                                                        if (CancelThread)
+                                                        {
+                                                            ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
+                                                            LastException = null;
+                                                            PercentOfProgress = 0;
+                                                            SetAndSendState(ParserInfoState);
+                                                        }
+
+                                                        // Get time to press "Cancel"
+                                                        Thread.Sleep(100);
+
+                                                        if (ThreadRunning)
+                                                        {
+                                                            // Signal that the thread has finished
+                                                            ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
+                                                            LastException = null;
+                                                            PercentOfProgress = 100;
+                                                            SetAndSendState(ParserInfoState);
+                                                        }
                                                     }
+                                                }
+
+                                                if (ThreadRunning)
+                                                {
+                                                    // Signal that the thread has finished
+                                                    ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
+                                                    LastException = null;
+                                                    PercentOfProgress = 100;
+                                                    SetAndSendState(ParserInfoState);
                                                 }
                                             }
                                         }
@@ -830,8 +979,26 @@ namespace Parser
                     {
                         // Set state
                         State = DataTypes.ParserState.Idle;
-                        ParserErrorCode = DataTypes.ParserErrorCodes.WebExceptionOccured;
+                        ParserErrorCode = DataTypes.ParserErrorCodes.WebExceptionOccurred;
                         LastException = webEx;
+                        PercentOfProgress = 0;
+                        SetAndSendState(ParserInfoState);
+                    }
+                    catch (FileNotFoundException fileEx)
+                    {
+                        // Set state
+                        State = DataTypes.ParserState.Idle;
+                        ParserErrorCode = DataTypes.ParserErrorCodes.FileExceptionOccurred;
+                        LastException = fileEx;
+                        PercentOfProgress = 0;
+                        SetAndSendState(ParserInfoState);
+                    }
+                    catch (JsonException jsonEx)
+                    {
+                        // Set state
+                        State = DataTypes.ParserState.Idle;
+                        ParserErrorCode = DataTypes.ParserErrorCodes.JsonExceptionOccurred;
+                        LastException = jsonEx;
                         PercentOfProgress = 0;
                         SetAndSendState(ParserInfoState);
                     }
@@ -839,7 +1006,7 @@ namespace Parser
                     {
                         // Set state
                         State = DataTypes.ParserState.Idle;
-                        ParserErrorCode = DataTypes.ParserErrorCodes.ExceptionOccured;
+                        ParserErrorCode = DataTypes.ParserErrorCodes.ExceptionOccurred;
                         LastException = ex;
                         PercentOfProgress = 0;
                         SetAndSendState(ParserInfoState);
@@ -870,10 +1037,15 @@ namespace Parser
         public void OnWebClientDownloadDataWebSiteCompleted(object sender, DownloadDataCompletedEventArgs e)
         {
             try
-            {
+            { 
                 _debugger.WriteDebuggingMsg(@"Event: OnWebClientDownloadDataWebSiteCompleted");
 
-                if (e.Error != null || e.Cancelled) return;
+                if (e.Error != null || e.Cancelled)
+                {
+                    WebSiteContentAsString = "";
+                    WebSiteDownloadComplete = true;
+                    return;
+                }
 
                 _debugger.WriteDebuggingMsg($@"e.Result.LongLength: OnWebClientDownloadDataWebSiteCompleted: {e.Result.LongLength}");
 
@@ -907,7 +1079,7 @@ namespace Parser
             {
                 // Set state
                 State = DataTypes.ParserState.Idle;
-                ParserErrorCode = DataTypes.ParserErrorCodes.WebExceptionOccured;
+                ParserErrorCode = DataTypes.ParserErrorCodes.WebExceptionOccurred;
                 LastException = webEx;
                 PercentOfProgress = 0;
                 SetAndSendState(ParserInfoState);
@@ -956,7 +1128,7 @@ namespace Parser
                     }
 
                     // Check if the given web address is not invalid and a web parsing should be done
-                    if (ParsingValues.WebSiteUrl == null && (ParsingValues.ParsingType == DataTypes.ParsingType.WebParsing || ParsingValues.ParsingType == DataTypes.ParsingType.DailyValuesParsing))
+                    if (ParsingValues.WebSiteUrl == null && ParsingValues.LoadingType == DataTypes.LoadType.Web)
                     {
                         ParserErrorCode = DataTypes.ParserErrorCodes.InvalidWebSiteGiven;
                         LastException = null;
@@ -965,7 +1137,9 @@ namespace Parser
                         return false;
                     }
 
-                    if ((ParsingValues.RegexList == null || ParsingValues.RegexList.RegexListDictionary.Count == 0) && ParsingValues.ParsingType == DataTypes.ParsingType.WebParsing)
+                    // Check if no or a empty regex list is given when parsing via RegEx should be done
+                    if ((ParsingValues.RegexList == null || ParsingValues.RegexList.RegexListDictionary.Count == 0)
+                        && ParsingValues.ParsingType == DataTypes.ParsingType.Regex)
                     {
                         ParserErrorCode = DataTypes.ParserErrorCodes.NoRegexListGiven;
                         LastException = null;
@@ -983,7 +1157,7 @@ namespace Parser
             {
                 // Set state
                 State = DataTypes.ParserState.Idle;
-                ParserErrorCode = DataTypes.ParserErrorCodes.ExceptionOccured;
+                ParserErrorCode = DataTypes.ParserErrorCodes.ExceptionOccurred;
                 LastException = ex;
                 PercentOfProgress = 0;
                 SetAndSendState(ParserInfoState);
@@ -998,8 +1172,8 @@ namespace Parser
         /// <param name="parserInfoState">ParserInfoState</param>
         private void SetAndSendState(DataTypes.ParserInfoState parserInfoState)
         {
-            _debugger.WriteDebuggingMsg($@"");
-            _debugger.WriteDebuggingMsg($@"SetAndSendState:");
+            _debugger.WriteDebuggingMsg(@"");
+            _debugger.WriteDebuggingMsg(@"SetAndSendState:");
             _debugger.WriteDebuggingMsg(
                 $@"State: {State} / ThreadRunning: {ThreadRunning} / ErrorCode: {parserInfoState.LastErrorCode} / PercentageOfProgress: {parserInfoState.Percentage}");
 
