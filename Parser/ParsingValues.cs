@@ -1,4 +1,26 @@
-﻿using System;
+﻿//MIT License
+//
+//Copyright(c) 2021 nessie1980(nessie1980 @gmx.de)
+//
+//Permission is hereby granted, free of charge, to any person obtaining a copy
+//of this software and associated documentation files (the "Software"), to deal
+//in the Software without restriction, including without limitation the rights
+//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//copies of the Software, and to permit persons to whom the Software is
+//furnished to do so, subject to the following conditions:
+//
+//The above copyright notice and this permission notice shall be included in all
+//copies or substantial portions of the Software.
+//
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//SOFTWARE.
+
+using System;
 using System.Text.RegularExpressions;
 
 namespace Parser
@@ -17,10 +39,17 @@ namespace Parser
         #region Properties
 
         /// <summary>
+        /// Type of the content load
+        /// Web: Load content of the given URL for the parsing
+        /// Text: A given text will be used for the parsing
+        /// </summary>
+        public DataTypes.LoadType LoadingType { get; set; }
+
+        /// <summary>
         /// Type for the parsing
-        /// WebParsing: A given url will be loaded and the website content will be parsed by the given regex list
-        /// TextParsing: A given text will be parsed by the given regex list
-        /// DailyValuesParing: A given url will be loaded and the website content will be parsed for the daily values
+        /// Regex: Parse the content by the given regex list
+        /// OnVistaRealTime: Serialize the content to a JSON object and then copy it to the regex result
+        /// OnVistaHistoryData: Serialize the content to a JSON object and then copy it to the daily values result
         /// </summary>
         public DataTypes.ParsingType ParsingType { get; set; }
 
@@ -91,14 +120,15 @@ namespace Parser
         #endregion Properties
 
         /// <summary>
-        /// Parsing values with a text which should be parsed
+        /// Parsing values for parsing a given text with the given regex list values
         /// </summary>
         /// <param name="parsingText">Text which should be parsed</param>
         /// <param name="encoding">Encoding of the text</param>
         /// <param name="regexList">Regex list for the parsing</param>
         public ParsingValues(string parsingText, string encoding, RegExList regexList)
         {
-            ParsingType = DataTypes.ParsingType.TextParsing;
+            LoadingType = DataTypes.LoadType.Text;
+            ParsingType = DataTypes.ParsingType.Regex;
             WebSiteUrl = null;
             ParsingText = parsingText;
             EncodingType = encoding;
@@ -106,14 +136,15 @@ namespace Parser
         }
 
         /// <summary>
-        /// Parsing values with a URL for where the text which should be parsed should be loaded
+        /// Parsing values for parsing the loaded URL content with the given regex list
         /// </summary>
-        /// <param name="webSiteUrl">URL form where the text which should be parsed should be loaded</param>
+        /// <param name="webSiteUrl">URL from which the content should be loaded which should be parsed</param>
         /// <param name="encoding">Encoding of the URL website</param>
         /// <param name="regexList">Regex list for the parsing</param>
         public ParsingValues(Uri webSiteUrl, string encoding, RegExList regexList)
         {
-            ParsingType = DataTypes.ParsingType.WebParsing;
+            LoadingType = DataTypes.LoadType.Web;
+            ParsingType = DataTypes.ParsingType.Regex;
             WebSiteUrl = webSiteUrl;
             ParsingText = null;
             EncodingType = encoding;
@@ -121,13 +152,15 @@ namespace Parser
         }
 
         /// <summary>
-        /// Parsing values with a URL for where the text which should be parsed for daily values
+        /// Parsing values for parsing the loaded URL content as JSON and map the JSON values to the parsing result
         /// </summary>
-        /// <param name="webSiteUrl">URL from where the text which should be parsed should be loaded</param>
+        /// <param name="webSiteUrl">URL from which the content should be loaded as JSON</param>
         /// <param name="encoding">Encoding of the URL website</param>
-        public ParsingValues(Uri webSiteUrl, string encoding)
+        /// <param name="parsingType">Parsing type</param>
+        public ParsingValues(Uri webSiteUrl, string encoding, DataTypes.ParsingType parsingType)
         {
-            ParsingType = DataTypes.ParsingType.DailyValuesParsing;
+
+            ParsingType = parsingType;
             WebSiteUrl = webSiteUrl;
             ParsingText = null;
             EncodingType = encoding;
