@@ -1,0 +1,9 @@
+obj
+/ParserTester/bin
+/ParserTester/obj
+.vs
+packages
+bin
+Debug
+Release
+*.user

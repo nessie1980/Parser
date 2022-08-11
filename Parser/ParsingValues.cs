@@ -102,6 +102,11 @@ namespace Parser
         }
 
         /// <summary>
+        /// String for the API key
+        /// </summary>
+        public string ApiKey { get; internal set; }
+
+        /// <summary>
         /// Uri for the website which is original given to the parser
         /// Used for later usage ( e.g. logging )
         /// </summary>
@@ -130,6 +135,7 @@ namespace Parser
             LoadingType = DataTypes.LoadType.Text;
             ParsingType = DataTypes.ParsingType.Regex;
             WebSiteUrl = null;
+            ApiKey = null;
             ParsingText = parsingText;
             EncodingType = encoding;
             RegexList = regexList;
@@ -146,6 +152,7 @@ namespace Parser
             LoadingType = DataTypes.LoadType.Web;
             ParsingType = DataTypes.ParsingType.Regex;
             WebSiteUrl = webSiteUrl;
+            ApiKey = null;
             ParsingText = null;
             EncodingType = encoding;
             RegexList = regexList;
@@ -155,13 +162,15 @@ namespace Parser
         /// Parsing values for parsing the loaded URL content as JSON and map the JSON values to the parsing result
         /// </summary>
         /// <param name="webSiteUrl">URL from which the content should be loaded as JSON</param>
+        /// <param name="apiKey">Key for the API</param>
         /// <param name="encoding">Encoding of the URL website</param>
         /// <param name="parsingType">Parsing type</param>
-        public ParsingValues(Uri webSiteUrl, string encoding, DataTypes.ParsingType parsingType)
+        public ParsingValues(Uri webSiteUrl, string apiKey, string encoding, DataTypes.ParsingType parsingType)
         {
 
             ParsingType = parsingType;
             WebSiteUrl = webSiteUrl;
+            ApiKey = apiKey;
             ParsingText = null;
             EncodingType = encoding;
             RegexList = null;

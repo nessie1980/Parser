@@ -73,8 +73,11 @@
     <Compile Include="DailyValues.cs" />
     <Compile Include="DataTypes.cs" />
     <Compile Include="Debugging.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="JsonObjects\OnVista\OnVistaHistoryData.cs" />
     <Compile Include="JsonObjects\OnVista\OnVistaRealTimeData.cs" />
+    <Compile Include="JsonObjects\Yahoo\YahooHistoryData.cs" />
+    <Compile Include="JsonObjects\Yahoo\YahooRealTimeData.cs" />
     <Compile Include="ParsingValues.cs" />
     <Compile Include="Regex.cs" />
     <Compile Include="Parser.cs" />

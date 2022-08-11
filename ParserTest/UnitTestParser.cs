@@ -302,10 +302,10 @@ namespace ParserTest
         }
 
         /// <summary>
-        /// This test checks if a history API request could be done
+        /// This test checks if a OnVista history API request could be done
         /// </summary>
         [Test]
-        public void Test_7_CheckApiRequestHistory()
+        public void Test_7_CheckOnVistaApiRequestHistory()
         {
             // Create parser
             var newParser = new Parser.Parser();
@@ -323,7 +323,7 @@ namespace ParserTest
                 webSiteUrl = uriResult;
 
             // Set parsing value to the parser
-            newParser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), DataTypes.ParsingType.OnVistaHistoryData);
+            newParser.ParsingValues = new ParsingValues(webSiteUrl, null, Encoding.UTF8.ToString(), DataTypes.ParsingType.OnVistaHistoryData);
 
             // Create delegate function which adds the received events to the list
             newParser.OnParserUpdate += delegate (object sender, DataTypes.OnParserUpdateEventArgs e)
@@ -354,10 +354,10 @@ namespace ParserTest
         }
 
         /// <summary>
-        /// This test checks if a history API request could be done
+        /// This test checks if a OnVista history API request could be done
         /// </summary>
         [Test]
-        public void Test_8_CheckApiRequestHistory()
+        public void Test_8_CheckOnVistaApiRequestHistoryWebContentNotLoaded()
         {
             // Create parser
             var newParser = new Parser.Parser();
@@ -375,7 +375,7 @@ namespace ParserTest
                 webSiteUrl = uriResult;
 
             // Set parsing value to the parser
-            newParser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), DataTypes.ParsingType.OnVistaHistoryData);
+            newParser.ParsingValues = new ParsingValues(webSiteUrl, null, Encoding.UTF8.ToString(), DataTypes.ParsingType.OnVistaHistoryData);
 
             // Create delegate function which adds the received events to the list
             newParser.OnParserUpdate += delegate (object sender, DataTypes.OnParserUpdateEventArgs e)
@@ -405,8 +405,11 @@ namespace ParserTest
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.NoWebContentLoaded), 0);
         }
 
-        [Test]
-        public void Test_9_CheckApiRequestRealTime()
+        /// <summary>
+        /// This test checks if a OnVista realtime API request could be done
+        /// </summary>
+        /*[Test]
+        public void Test_9_CheckOnVistaApiRequestRealTime()
         {
             // Create parser
             var newParser = new Parser.Parser();
@@ -424,7 +427,112 @@ namespace ParserTest
                 webSiteUrl = uriResult;
 
             // Set parsing value to the parser
-            newParser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), DataTypes.ParsingType.OnVistaRealTime);
+            newParser.ParsingValues = new ParsingValues(webSiteUrl, null, Encoding.UTF8.ToString(), DataTypes.ParsingType.OnVistaRealTime);
+
+            // Create delegate function which adds the received events to the list
+            newParser.OnParserUpdate += delegate (object sender, DataTypes.OnParserUpdateEventArgs e)
+            {
+                receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
+                receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+            };
+
+            // Start parsing
+            var result = newParser.StartParsing();
+
+            // Check if the start was not successful
+            Assert.AreEqual(true, result);
+
+            // Wait for the parsing result with a 5s timeout
+            var counter = 0;
+            while (counter < 500 &&
+                   receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished) < 0)
+            {
+                Thread.Sleep(10);
+                counter++;
+            }
+
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+
+            // Check if the Finished event has been signaled
+            Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished), 0);
+        }*/
+
+        /// <summary>
+        /// This test checks if a OnVista realtime API request could not be done
+        /// </summary>
+        /*[Test]
+        public void Test_10_CheckOnVistaApiRequestRealTimeError()
+        {
+            // Create parser
+            var newParser = new Parser.Parser();
+            // Create list for the received events
+            var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
+            var receivedEventsWebContent = new List<string>();
+
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
+            // Set website to the Parser
+            if (Uri.TryCreate(
+                @"https://www.onvista.de/api/quote/9385986/RL",
+                UriKind.Absolute, out var uriResult))
+                webSiteUrl = uriResult;
+
+            // Set parsing value to the parser
+            newParser.ParsingValues = new ParsingValues(webSiteUrl, null, Encoding.UTF8.ToString(), DataTypes.ParsingType.OnVistaRealTime);
+
+            // Create delegate function which adds the received events to the list
+            newParser.OnParserUpdate += delegate (object sender, DataTypes.OnParserUpdateEventArgs e)
+            {
+                receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
+                receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+            };
+
+            // Start parsing
+            var result = newParser.StartParsing();
+
+            // Check if the start was not successful
+            Assert.AreEqual(true, result);
+
+            // Wait for the parsing result with a 5s timeout
+            var counter = 0;
+            while (counter < 500 &&
+                   receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.NoWebContentLoaded) < 0)
+            {
+                Thread.Sleep(10);
+                counter++;
+            }
+
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+
+            // Check if the Finished event has been signaled
+            Assert.GreaterOrEqual(
+                receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.NoWebContentLoaded), 0);
+        }*/
+
+        /// <summary>
+        /// This test checks if a Yahoo realtime API request could be done
+        /// </summary>
+        [Test]
+        public void Test_11_CheckYahooApiRequestRealTime()
+        {
+            // Create parser
+            var newParser = new Parser.Parser(true);
+            // Create list for the received events
+            var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
+            var receivedEventsWebContent = new List<string>();
+
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
+            // Set website to the Parser
+            if (Uri.TryCreate(
+                @"https://yfapi.net/v6/finance/quote?region=DE&lang=de&symbols=APC.F",
+                UriKind.Absolute, out var uriResult))
+                webSiteUrl = uriResult;
+
+            // Set parsing value to the parser
+            newParser.ParsingValues = new ParsingValues(webSiteUrl, "T7Dcb5soihfwQpPoQAXtMashju0rQj8VCfztXC90", Encoding.UTF8.ToString(), DataTypes.ParsingType.YahooRealTime);
 
             // Create delegate function which adds the received events to the list
             newParser.OnParserUpdate += delegate (object sender, DataTypes.OnParserUpdateEventArgs e)
@@ -454,11 +562,14 @@ namespace ParserTest
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished), 0);
         }
 
+        /// <summary>
+        /// This test checks if a Yahoo realtime API request could be done
+        /// </summary>
         [Test]
-        public void Test_10_CheckApiRequestError()
+        public void Test_12_CheckYahooApiRequestHistoryData()
         {
             // Create parser
-            var newParser = new Parser.Parser();
+            var newParser = new Parser.Parser(true);
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
@@ -468,12 +579,12 @@ namespace ParserTest
 
             // Set website to the Parser
             if (Uri.TryCreate(
-                @"https://www.onvista.de/api/quote/9385986/RL",
+                @"https://yfapi.net/v8/finance/chart/APC.F?range=1mo&region=DE&interval=1d&lang=de",
                 UriKind.Absolute, out var uriResult))
                 webSiteUrl = uriResult;
 
             // Set parsing value to the parser
-            newParser.ParsingValues = new ParsingValues(webSiteUrl, Encoding.UTF8.ToString(), DataTypes.ParsingType.OnVistaRealTime);
+            newParser.ParsingValues = new ParsingValues(webSiteUrl, "T7Dcb5soihfwQpPoQAXtMashju0rQj8VCfztXC90", Encoding.UTF8.ToString(), DataTypes.ParsingType.YahooHistoryData);
 
             // Create delegate function which adds the received events to the list
             newParser.OnParserUpdate += delegate (object sender, DataTypes.OnParserUpdateEventArgs e)
@@ -491,7 +602,7 @@ namespace ParserTest
             // Wait for the parsing result with a 5s timeout
             var counter = 0;
             while (counter < 500 &&
-                   receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.NoWebContentLoaded) < 0)
+                   receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished) < 0)
             {
                 Thread.Sleep(10);
                 counter++;
@@ -500,8 +611,7 @@ namespace ParserTest
             ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
 
             // Check if the Finished event has been signaled
-            Assert.GreaterOrEqual(
-                receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.NoWebContentLoaded), 0);
+            Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished), 0);
         }
 
         private static void ShowParsingErrorCodes(List<DataTypes.ParserErrorCodes> errorCodes, List<string> webContent)

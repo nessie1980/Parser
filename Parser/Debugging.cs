@@ -41,13 +41,19 @@ namespace Parser
         /// </summary>
         public string DebuggingFileName = @"Debugging_Parser.txt";
 
+        /// <summary>
+        /// Fixed path name for the text file debugging
+        /// </summary>
+        public string DebuggingPath = @"C:\\";
+
         #endregion Properties
 
         #region Methods
 
-        public Debugging(int instance)
+        public Debugging(int instance, string path)
         {
             ParserInstance = instance;
+            DebuggingPath = path;
         }
 
         /// <summary>
@@ -60,7 +66,7 @@ namespace Parser
         {
             if (!DebuggingEnabled) return;
 
-            DebuggingFileName = $"Debugging_Parser_{ParserInstance}.txt";
+            DebuggingFileName = DebuggingPath + $"Debugging_Parser_{ParserInstance}.txt";
 
             try
             {

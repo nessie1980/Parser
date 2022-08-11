@@ -42,8 +42,10 @@ namespace Parser
         public enum ParsingType
         {
             Regex,                  // Regex parsing of the content via the given regex list
-            OnVistaRealTime,        // JSON parsing of the real time value of the OnVista portal
-            OnVistaHistoryData      // JSON parsing of the daily values of the OnVista portal
+            OnVistaRealTime,        // JSON parsing of the real time value of the OnVista finance API
+            OnVistaHistoryData,     // JSON parsing of the daily values of the OnVista finance API
+            YahooRealTime,          // JSON parsing of the real time value of the Yahoo finance API
+            YahooHistoryData        // JSON parsing of the daily values of the Yahoo finance API
         };
 
         /// <summary>
