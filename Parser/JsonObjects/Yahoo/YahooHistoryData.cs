@@ -27,7 +27,14 @@ namespace Parser.JsonObjects.Yahoo
     // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
     public class Adjclose
     {
-        public List<double> AdjcloseData { get; set; }
+        public List<double?> AdjClose { get; set; }
+    }
+
+    public partial class Result
+    {
+        public Meta Meta { get; set; }
+        public List<int> Timestamp { get; set; }
+        public Indicators Indicators { get; set; }
     }
 
     public class Chart
@@ -55,7 +62,7 @@ namespace Parser.JsonObjects.Yahoo
         public string Symbol { get; set; }
         public string ExchangeName { get; set; }
         public string InstrumentType { get; set; }
-        public int FirstTradeDate { get; set; }
+        public object FirstTradeDate { get; set; }
         public int RegularMarketTime { get; set; }
         public int Gmtoffset { get; set; }
         public string Timezone { get; set; }
@@ -72,8 +79,8 @@ namespace Parser.JsonObjects.Yahoo
     public class Post
     {
         public string Timezone { get; set; }
-        public int Start { get; set; }
         public int End { get; set; }
+        public int Start { get; set; }
         public int Gmtoffset { get; set; }
     }
 
@@ -87,34 +94,23 @@ namespace Parser.JsonObjects.Yahoo
 
     public class Quote
     {
-        public List<double> Low { get; set; }
-        public List<int> Volume { get; set; }
-        public List<double> High { get; set; }
-        public List<double> Close { get; set; }
-        public List<double> Open { get; set; }
+        public List<double?> Low { get; set; }
+        public List<double?> Close { get; set; }
+        public List<double?> Open { get; set; }
+        public List<double?> High { get; set; }
+        public List<int?> Volume { get; set; }
     }
 
     public class Regular
     {
         public string Timezone { get; set; }
-        public int Start { get; set; }
         public int End { get; set; }
+        public int Start { get; set; }
         public int Gmtoffset { get; set; }
-    }
-
-    public partial class Result
-    {
-        public Meta Meta { get; set; }
-        public List<int> Timestamp { get; set; }
-        public Indicators Indicators { get; set; }
     }
 
     public class HistoryData
     {
         public Chart Chart { get; set; }
     }
-
-
-
-
 }

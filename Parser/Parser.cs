@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -31,6 +32,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using Parser.JsonObjects.OnVista;
 using Parser.JsonObjects.Yahoo;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Parser
 {
@@ -478,9 +480,6 @@ namespace Parser
 
                                                     Thread.Sleep(10);
                                                 }
-
-                                                client.DownloadProgressChanged -= OnWebClientDownloadProgressChanged;
-                                                client.DownloadDataCompleted -= OnWebClientDownloadDataWebSiteCompleted;
                                             }
                                             catch (WebException webEx)
                                             {
@@ -491,6 +490,11 @@ namespace Parser
                                             {
                                                 _debugger.WriteDebuggingMsg($@"Exception: {e.Message}");
                                                 throw;
+                                            }
+                                            finally
+                                            {
+                                                client.DownloadProgressChanged -= OnWebClientDownloadProgressChanged;
+                                                client.DownloadDataCompleted -= OnWebClientDownloadDataWebSiteCompleted;
                                             }
                                         }
 
@@ -1190,25 +1194,33 @@ namespace Parser
 
                                                         for (var i = 0; i < historyData.Chart.Result[0].Timestamp.Count; i++)
                                                         {
-                                                            var dailyValues = new DailyValues
+                                                            // Check if each value is not null and then create a DailyValues object
+                                                            if (historyData.Chart.Result[0].Indicators.Quote[0].Open[i] != null &&
+                                                                historyData.Chart.Result[0].Indicators.Quote[0].Close[i] != null &&
+                                                                historyData.Chart.Result[0].Indicators.Quote[0].Low[i] != null &&
+                                                                historyData.Chart.Result[0].Indicators.Quote[0].High[i] != null &&
+                                                                historyData.Chart.Result[0].Indicators.Quote[0].Volume[i] != null)
                                                             {
-                                                                Date = DateTimeOffset
-                                                                    .FromUnixTimeSeconds(historyData.Chart.Result[0].Timestamp[i])
-                                                                    .Date,
-                                                                OpeningPrice = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].Open[i]), 2),
-                                                                ClosingPrice = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].Close[i]), 2),
-                                                                Bottom = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].Low[i]), 2),
-                                                                Top = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].High[i]), 2),
-                                                                Volume = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].Volume[i]), 2)
-                                                            };
+                                                                var dailyValues = new DailyValues
+                                                                {
+                                                                    Date = DateTimeOffset
+                                                                        .FromUnixTimeSeconds(historyData.Chart.Result[0].Timestamp[i])
+                                                                        .Date,
+                                                                    OpeningPrice = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].Open[i]), 2),
+                                                                    ClosingPrice = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].Close[i]), 2),
+                                                                    Bottom = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].Low[i]), 2),
+                                                                    Top = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].High[i]), 2),
+                                                                    Volume = decimal.Round(Convert.ToDecimal(historyData.Chart.Result[0].Indicators.Quote[0].Volume[i]), 2)
+                                                                };
 
-                                                            // Check if the DailyValuesResult list is already created
-                                                            if (ParserInfoState.DailyValuesList == null)
-                                                                ParserInfoState.DailyValuesList =
-                                                                    new List<DailyValues>();
+                                                                // Check if the DailyValuesResult list is already created
+                                                                if (ParserInfoState.DailyValuesList == null)
+                                                                    ParserInfoState.DailyValuesList =
+                                                                        new List<DailyValues>();
 
-                                                            // Add new daily values to the list
-                                                            ParserInfoState.DailyValuesList.Add(dailyValues);
+                                                                // Add new daily values to the list
+                                                                ParserInfoState.DailyValuesList.Add(dailyValues);
+                                                            }
 
                                                             // Increase state
                                                             stateValue += stateCountValueStep;
@@ -1341,6 +1353,11 @@ namespace Parser
                 {
                     WebSiteContentAsString = "";
                     WebSiteDownloadComplete = true;
+                    if (e.Error != null)
+                    {
+                        ParserInfoState.Exception = (WebException)e.Error;
+                    }
+
                     return;
                 }
 
