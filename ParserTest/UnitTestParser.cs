@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -26,6 +27,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -49,6 +51,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -61,7 +64,7 @@ namespace ParserTest
             // Check if the start was not successful
             Assert.AreEqual(false, result);
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the BusyFailed event has been signaled
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.BusyFailed), 0);
@@ -78,6 +81,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -94,6 +98,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -102,7 +107,7 @@ namespace ParserTest
             // Check if the start was not successful
             Assert.AreEqual(false, result);
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the InvalidWebSiteGiven event has been signaled
             Assert.GreaterOrEqual(
@@ -120,6 +125,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -136,6 +142,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -144,7 +151,7 @@ namespace ParserTest
             // Check if the start was not successful
             Assert.AreEqual(false, result);
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the InvalidWebSiteGiven event has been signaled
             Assert.GreaterOrEqual(
@@ -162,6 +169,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -178,6 +186,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -186,7 +195,7 @@ namespace ParserTest
             // Check if the start was not successful
             Assert.AreEqual(false, result);
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the NoRegexListGiven event has been signaled
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.NoRegexListGiven),
@@ -204,6 +213,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -224,6 +234,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -241,7 +252,7 @@ namespace ParserTest
                 counter++;
             }
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the ParsingFailed event has been signaled
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.ParsingFailed), 0);
@@ -258,6 +269,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -278,6 +290,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -295,7 +308,7 @@ namespace ParserTest
                 counter++;
             }
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the Finished event has been signaled
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished), 0);
@@ -312,6 +325,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -330,6 +344,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -347,7 +362,7 @@ namespace ParserTest
                 counter++;
             }
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the Finished event has been signaled
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished), 0);
@@ -364,6 +379,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -382,6 +398,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -399,7 +416,7 @@ namespace ParserTest
                 counter++;
             }
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the Finished event has been signaled
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.NoWebContentLoaded), 0);
@@ -416,6 +433,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -434,6 +452,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -468,6 +487,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -486,6 +506,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -521,6 +542,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -539,6 +561,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -556,7 +579,7 @@ namespace ParserTest
                 counter++;
             }
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the Finished event has been signaled
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished), 0);
@@ -573,6 +596,7 @@ namespace ParserTest
             // Create list for the received events
             var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
             var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
 
             // WebSiteUrl for the parser
             Uri webSiteUrl = null;
@@ -591,6 +615,7 @@ namespace ParserTest
             {
                 receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
                 receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
             };
 
             // Start parsing
@@ -608,18 +633,75 @@ namespace ParserTest
                 counter++;
             }
 
-            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent);
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
 
             // Check if the Finished event has been signaled
             Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished), 0);
         }
 
-        private static void ShowParsingErrorCodes(List<DataTypes.ParserErrorCodes> errorCodes, List<string> webContent)
+        /// <summary>
+        /// This test checks if a Yahoo realtime API request could be done
+        /// </summary>
+        [Test]
+        public void Test_13_CheckHttpStatusCode()
+        {
+            // Create parser
+            var newParser = new Parser.Parser(true);
+            // Create list for the received events
+            var receivedEventsCodes = new List<DataTypes.ParserErrorCodes>();
+            var receivedEventsWebContent = new List<string>();
+            var receivedEventsHttpStatucCode = new List<HttpStatusCode>();
+
+            // WebSiteUrl for the parser
+            Uri webSiteUrl = null;
+
+            // Set website to the Parser
+            if (Uri.TryCreate(
+                @"https://www.onvista.de/api/quote/9385986/RLT",
+                UriKind.Absolute, out var uriResult))
+                webSiteUrl = uriResult;
+
+            // Set parsing value to the parser
+            newParser.ParsingValues = new ParsingValues(webSiteUrl, @"", Encoding.UTF8.ToString(), DataTypes.ParsingType.YahooHistoryData);
+
+            // Create delegate function which adds the received events to the list
+            newParser.OnParserUpdate += delegate (object sender, DataTypes.OnParserUpdateEventArgs e)
+            {
+                receivedEventsCodes.Add(e.ParserInfoState.LastErrorCode);
+                receivedEventsWebContent.Add(e.ParserInfoState.WebSiteContentAsString);
+                receivedEventsHttpStatucCode.Add(e.ParserInfoState.HttpStatus);
+            };
+
+            // Start parsing
+            var result = newParser.StartParsing();
+
+            // Check if the start was not successful
+            Assert.AreEqual(true, result);
+
+            // Wait for the parsing result with a 5s timeout
+            var counter = 0;
+            while (counter < 300 &&
+                   receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.Finished) < 0)
+            {
+                Thread.Sleep(10);
+                counter++;
+            }
+
+            ShowParsingErrorCodes(receivedEventsCodes, receivedEventsWebContent, receivedEventsHttpStatucCode);
+
+            // Check if the Finished event has been signaled
+            Assert.GreaterOrEqual(receivedEventsCodes.FindIndex(x => x == DataTypes.ParserErrorCodes.NoWebContentLoaded), 0);
+            Assert.GreaterOrEqual(receivedEventsHttpStatucCode.FindIndex(x => x == HttpStatusCode.NotFound), 0);
+        }
+
+        private static void ShowParsingErrorCodes(List<DataTypes.ParserErrorCodes> errorCodes, List<string> webContent, List<HttpStatusCode>httpStatusCodes)
         {
             for (var i = 0; i < errorCodes.Count; i++)
             {
                 Console.WriteLine(@"ErrorCode:  {0}", errorCodes[i]);
                 Console.WriteLine(@"WebContent: {0}", webContent[i]);
+                Console.WriteLine(@"HttpCode:   {0}", httpStatusCodes[i]);
+
                 Console.WriteLine(@"");
             }
         }

@@ -21,6 +21,7 @@
 //SOFTWARE.
 
 using System;
+using System.Net;
 using System.Collections.Generic;
 
 namespace Parser
@@ -108,6 +109,11 @@ namespace Parser
             /// Current state of the Parser
             /// </summary>
             public ParserState State { get; internal set; }
+
+            /// <summary>
+            /// Current http status of a web response
+            /// </summary>
+            public HttpStatusCode HttpStatus { get; internal set; }
 
             /// <summary>
             /// Percentage of the update process

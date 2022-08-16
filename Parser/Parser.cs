@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -32,7 +31,6 @@ using System.Threading;
 using Newtonsoft.Json;
 using Parser.JsonObjects.OnVista;
 using Parser.JsonObjects.Yahoo;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Parser
 {
@@ -250,6 +248,13 @@ namespace Parser
 
         /// <summary>
         /// Stores the last throw exception
+        /// This exception is directly store in the variable ParserInfoState.Exception
+        /// It will automtically
+        /// Current possible exception types
+        /// - Exception
+        /// - WebException
+        /// - FileNotFoundException
+        /// - JsonException
         /// </summary>
         public Exception LastException
         {
@@ -406,7 +411,6 @@ namespace Parser
                             // Set state
                             State = DataTypes.ParserState.Started;
                             ParserErrorCode = DataTypes.ParserErrorCodes.Started;
-                            LastException = null;
                             LastParsedRegexListKey = null;
                             PercentOfProgress = 0;
                             SetAndSendState(ParserInfoState);
@@ -415,7 +419,6 @@ namespace Parser
                             if (CancelThread)
                             {
                                 ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                LastException = null;
                                 PercentOfProgress = 0;
                                 SetAndSendState(ParserInfoState);
                             }
@@ -429,9 +432,7 @@ namespace Parser
                                 // Check if thread should be canceled
                                 if (CancelThread)
                                 {
-
                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                    LastException = null;
                                     PercentOfProgress = 0;
                                     SetAndSendState(ParserInfoState);
                                 }
@@ -444,7 +445,6 @@ namespace Parser
                                         // Set state to loading
                                         State = DataTypes.ParserState.Loading;
                                         ParserErrorCode = DataTypes.ParserErrorCodes.ContentLoadStarted;
-                                        LastException = null;
                                         PercentOfProgress = 5;
                                         SetAndSendState(ParserInfoState);
 
@@ -470,7 +470,6 @@ namespace Parser
                                                     {
 
                                                         ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                        LastException = null;
                                                         PercentOfProgress = 0;
                                                         SetAndSendState(ParserInfoState);
                                                         WebSiteDownloadComplete = false;
@@ -498,21 +497,16 @@ namespace Parser
                                             }
                                         }
 
-                                        // Set loaded web site content to parsing text
-                                        TextForParsing = WebSiteContentAsString;
-
                                         // Check if the website content load was successful and call event
                                         if (WebSiteContentAsString == @"")
                                         {
                                             ParserErrorCode = DataTypes.ParserErrorCodes.NoWebContentLoaded;
-                                            LastException = null;
                                             PercentOfProgress = 0;
                                             SetAndSendState(ParserInfoState);
                                         }
                                         else
                                         {
                                             ParserErrorCode = DataTypes.ParserErrorCodes.ContentLoadFinished;
-                                            LastException = null;
                                             PercentOfProgress = 10;
                                             SetAndSendState(ParserInfoState);
                                         }
@@ -521,10 +515,12 @@ namespace Parser
                                         if (CancelThread)
                                         {
                                             ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                            LastException = null;
                                             PercentOfProgress = 0;
                                             SetAndSendState(ParserInfoState);
                                         }
+
+                                        // Set loaded web site content to parsing text
+                                        TextForParsing = WebSiteContentAsString;
                                     }
 
                                     // Set given parsing text to the parser variable
@@ -543,7 +539,6 @@ namespace Parser
                                             // Set state to parsing
                                             State = DataTypes.ParserState.Parsing;
                                             ParserErrorCode = DataTypes.ParserErrorCodes.SearchStarted;
-                                            LastException = null;
                                             PercentOfProgress = 15;
                                             SetAndSendState(ParserInfoState);
 
@@ -559,7 +554,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                     break;
@@ -624,7 +618,6 @@ namespace Parser
                                                             {
                                                                 ParserErrorCode = DataTypes.ParserErrorCodes
                                                                     .CancelThread;
-                                                                LastException = null;
                                                                 PercentOfProgress = 0;
                                                                 SetAndSendState(ParserInfoState);
                                                             }
@@ -652,7 +645,6 @@ namespace Parser
                                                             {
                                                                 ParserErrorCode = DataTypes.ParserErrorCodes
                                                                     .CancelThread;
-                                                                LastException = null;
                                                                 PercentOfProgress = 0;
                                                                 SetAndSendState(ParserInfoState);
                                                             }
@@ -667,7 +659,6 @@ namespace Parser
                                                                 {
                                                                     ParserErrorCode = DataTypes.ParserErrorCodes
                                                                         .CancelThread;
-                                                                    LastException = null;
                                                                     PercentOfProgress = 0;
                                                                     SetAndSendState(ParserInfoState);
                                                                 }
@@ -691,7 +682,6 @@ namespace Parser
                                                     _debugger.WriteDebuggingMsg(@"No MATCH found!");
 
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.ParsingFailed;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                     break;
@@ -702,7 +692,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -714,7 +703,6 @@ namespace Parser
                                             if (ThreadRunning)
                                             {
                                                 ParserErrorCode = DataTypes.ParserErrorCodes.SearchFinished;
-                                                LastException = null;
                                                 PercentOfProgress = 100;
                                                 SetAndSendState(ParserInfoState);
                                             }
@@ -723,7 +711,6 @@ namespace Parser
                                             if (CancelThread)
                                             {
                                                 ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                LastException = null;
                                                 PercentOfProgress = 0;
                                                 SetAndSendState(ParserInfoState);
                                             }
@@ -735,7 +722,6 @@ namespace Parser
                                             {
                                                 // Signal that the thread has finished
                                                 ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
-                                                LastException = null;
                                                 PercentOfProgress = 100;
                                                 SetAndSendState(ParserInfoState);
                                             }
@@ -768,7 +754,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -778,7 +763,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -789,7 +773,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -799,7 +782,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -810,7 +792,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -820,7 +801,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -831,7 +811,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -841,7 +820,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -852,7 +830,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -862,7 +839,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -871,7 +847,6 @@ namespace Parser
                                                 {
                                                     // Signal that the thread has finished
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
-                                                    LastException = null;
                                                     PercentOfProgress = 100;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -889,7 +864,6 @@ namespace Parser
                                                 if (historyData.First.Length == 0)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.NoWebContentLoaded;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -906,7 +880,6 @@ namespace Parser
                                                     {
                                                         ParserErrorCode = DataTypes.ParserErrorCodes
                                                             .ParsingFailed;
-                                                        LastException = null;
                                                         PercentOfProgress = 0;
                                                         SetAndSendState(ParserInfoState);
                                                     }
@@ -946,7 +919,6 @@ namespace Parser
                                                             {
                                                                 ParserErrorCode = DataTypes.ParserErrorCodes
                                                                     .SearchRunning;
-                                                                LastException = null;
                                                                 PercentOfProgress = (int)stateValue;
                                                                 SetAndSendState(ParserInfoState);
                                                             }
@@ -958,7 +930,6 @@ namespace Parser
                                                         if (ThreadRunning)
                                                         {
                                                             ParserErrorCode = DataTypes.ParserErrorCodes.SearchFinished;
-                                                            LastException = null;
                                                             PercentOfProgress = 100;
                                                             SetAndSendState(ParserInfoState);
                                                         }
@@ -967,7 +938,6 @@ namespace Parser
                                                         if (CancelThread)
                                                         {
                                                             ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                            LastException = null;
                                                             PercentOfProgress = 0;
                                                             SetAndSendState(ParserInfoState);
                                                         }
@@ -979,7 +949,6 @@ namespace Parser
                                                         {
                                                             // Signal that the thread has finished
                                                             ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
-                                                            LastException = null;
                                                             PercentOfProgress = 100;
                                                             SetAndSendState(ParserInfoState);
                                                         }
@@ -990,7 +959,6 @@ namespace Parser
                                                 {
                                                     // Signal that the thread has finished
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
-                                                    LastException = null;
                                                     PercentOfProgress = 100;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1020,7 +988,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1030,7 +997,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1048,7 +1014,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1058,7 +1023,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1076,7 +1040,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1086,7 +1049,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1097,7 +1059,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1107,7 +1068,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1118,7 +1078,6 @@ namespace Parser
                                                 if (statusValue < 100)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.SearchRunning;
-                                                    LastException = null;
                                                     PercentOfProgress = statusValue;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1128,7 +1087,6 @@ namespace Parser
                                                 if (CancelThread)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1137,7 +1095,6 @@ namespace Parser
                                                 {
                                                     // Signal that the thread has finished
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
-                                                    LastException = null;
                                                     PercentOfProgress = 100;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1160,7 +1117,6 @@ namespace Parser
                                                     historyData.Chart.Result[0].Indicators.Quote.Count == 0)
                                                 {
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.NoWebContentLoaded;
-                                                    LastException = null;
                                                     PercentOfProgress = 0;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1181,7 +1137,6 @@ namespace Parser
                                                     {
                                                         ParserErrorCode = DataTypes.ParserErrorCodes
                                                             .ParsingFailed;
-                                                        LastException = null;
                                                         PercentOfProgress = 0;
                                                         SetAndSendState(ParserInfoState);
                                                     }
@@ -1229,7 +1184,6 @@ namespace Parser
                                                             {
                                                                 ParserErrorCode = DataTypes.ParserErrorCodes
                                                                     .SearchRunning;
-                                                                LastException = null;
                                                                 PercentOfProgress = (int)stateValue;
                                                                 SetAndSendState(ParserInfoState);
                                                             }
@@ -1241,7 +1195,6 @@ namespace Parser
                                                         if (ThreadRunning)
                                                         {
                                                             ParserErrorCode = DataTypes.ParserErrorCodes.SearchFinished;
-                                                            LastException = null;
                                                             PercentOfProgress = 100;
                                                             SetAndSendState(ParserInfoState);
                                                         }
@@ -1250,7 +1203,6 @@ namespace Parser
                                                         if (CancelThread)
                                                         {
                                                             ParserErrorCode = DataTypes.ParserErrorCodes.CancelThread;
-                                                            LastException = null;
                                                             PercentOfProgress = 0;
                                                             SetAndSendState(ParserInfoState);
                                                         }
@@ -1262,7 +1214,6 @@ namespace Parser
                                                         {
                                                             // Signal that the thread has finished
                                                             ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
-                                                            LastException = null;
                                                             PercentOfProgress = 100;
                                                             SetAndSendState(ParserInfoState);
                                                         }
@@ -1273,7 +1224,6 @@ namespace Parser
                                                 {
                                                     // Signal that the thread has finished
                                                     ParserErrorCode = DataTypes.ParserErrorCodes.Finished;
-                                                    LastException = null;
                                                     PercentOfProgress = 100;
                                                     SetAndSendState(ParserInfoState);
                                                 }
@@ -1351,39 +1301,63 @@ namespace Parser
 
                 if (e.Error != null || e.Cancelled)
                 {
-                    WebSiteContentAsString = "";
+                    WebSiteContentAsString = @"";
                     WebSiteDownloadComplete = true;
+
+                    // Check if an error occurred
                     if (e.Error != null)
                     {
-                        ParserInfoState.Exception = (WebException)e.Error;
+                        // Check if error type is WebException
+                        if (e.Error.GetType() == typeof(WebException))
+                        {
+                            LastException = (WebException)e.Error;
+
+                            // Read out the response data
+                            WebSiteContentAsByteArray = new byte[((WebException)e.Error).Response.ContentLength];
+                            ParserInfoState.WebSiteContentAsByteArray = new byte[((WebException)e.Error).Response.ContentLength];
+
+                            ((WebException)e.Error).Response.GetResponseStream().Read(WebSiteContentAsByteArray, 0, (int)(((WebException)e.Error).Response.ContentLength));
+                            Buffer.BlockCopy(WebSiteContentAsByteArray, 0, ParserInfoState.WebSiteContentAsByteArray, 0, WebSiteContentAsByteArray.Length);
+
+                            ParserInfoState.WebSiteContentAsString = Encoding.UTF8.GetString(WebSiteContentAsByteArray);
+
+                            // Read out response status code
+                            if (((WebException)e.Error).Response.GetType() == typeof(HttpWebResponse))
+                            {
+                                ParserInfoState.HttpStatus = ((HttpWebResponse)((WebException)e.Error).Response).StatusCode;
+                            }
+                        }
                     }
 
                     return;
                 }
 
-                _debugger.WriteDebuggingMsg($@"e.Result.LongLength: OnWebClientDownloadDataWebSiteCompleted: {e.Result.LongLength}");
-
-                if (e.Result.LongLength > 0)
+                if (e.Result != null)
                 {
-                    WebSiteContentAsByteArray = new byte[e.Result.LongLength];
-                    ParserInfoState.WebSiteContentAsByteArray = new byte[e.Result.Length];
+                    _debugger.WriteDebuggingMsg($@"e.Result.LongLength: OnWebClientDownloadDataWebSiteCompleted: {e.Result.LongLength}");
 
-                    WebSiteContentAsString = Encoding.UTF8.GetString(e.Result);
-                    // Copy loaded content string to the parser info state
-                    ParserInfoState.WebSiteContentAsString = WebSiteContentAsString;
+                    if (e.Result.LongLength > 0)
+                    {
+                        WebSiteContentAsByteArray = new byte[e.Result.LongLength];
+                        ParserInfoState.WebSiteContentAsByteArray = new byte[e.Result.Length];
 
-                    Buffer.BlockCopy(e.Result, 0, WebSiteContentAsByteArray, 0, e.Result.Length);
-                    // Copy loaded content byte array to the parser info state
-                    Buffer.BlockCopy(WebSiteContentAsByteArray, 0, ParserInfoState.WebSiteContentAsByteArray, 0, WebSiteContentAsByteArray.Length);
-                }
-                else
-                {
-                    WebSiteContentAsString = "";
-                    // Copy loaded content string to the parser info state
-                    ParserInfoState.WebSiteContentAsString = WebSiteContentAsString;
+                        WebSiteContentAsString = Encoding.UTF8.GetString(e.Result);
+                        // Copy loaded content string to the parser info state
+                        ParserInfoState.WebSiteContentAsString = WebSiteContentAsString;
 
-                    WebSiteContentAsByteArray = null;
-                    ParserInfoState.WebSiteContentAsByteArray = null;
+                        Buffer.BlockCopy(e.Result, 0, WebSiteContentAsByteArray, 0, e.Result.Length);
+                        // Copy loaded content byte array to the parser info state
+                        Buffer.BlockCopy(WebSiteContentAsByteArray, 0, ParserInfoState.WebSiteContentAsByteArray, 0, WebSiteContentAsByteArray.Length);
+                    }
+                    else
+                    {
+                        WebSiteContentAsString = "";
+                        // Copy loaded content string to the parser info state
+                        ParserInfoState.WebSiteContentAsString = WebSiteContentAsString;
+
+                        WebSiteContentAsByteArray = null;
+                        ParserInfoState.WebSiteContentAsByteArray = null;
+                    }
                 }
 
                 ParserInfoState.PercentageDownload = 100;
@@ -1425,9 +1399,11 @@ namespace Parser
                         ParserInfoState.DailyValuesList = null;
                     }
 
+                    // Reset LastException value
+                    LastException = null;
+
                     // Send start event to the GUI
                     ParserErrorCode = DataTypes.ParserErrorCodes.Starting;
-                    LastException = null;
                     PercentOfProgress = 0;
                     SetAndSendState(ParserInfoState);
 
@@ -1435,7 +1411,6 @@ namespace Parser
                     if (State != DataTypes.ParserState.Idle)
                     {
                         ParserErrorCode = DataTypes.ParserErrorCodes.BusyFailed;
-                        LastException = null;
                         PercentOfProgress = 0;
                         SetAndSendState(ParserInfoState);
                         return false;
@@ -1445,7 +1420,6 @@ namespace Parser
                     if (ParsingValues.WebSiteUrl == null && ParsingValues.LoadingType == DataTypes.LoadType.Web)
                     {
                         ParserErrorCode = DataTypes.ParserErrorCodes.InvalidWebSiteGiven;
-                        LastException = null;
                         PercentOfProgress = 0;
                         SetAndSendState(ParserInfoState);
                         return false;
@@ -1456,7 +1430,6 @@ namespace Parser
                         && ParsingValues.ParsingType == DataTypes.ParsingType.Regex)
                     {
                         ParserErrorCode = DataTypes.ParserErrorCodes.NoRegexListGiven;
-                        LastException = null;
                         PercentOfProgress = 0;
                         SetAndSendState(ParserInfoState);
                         return false;
@@ -1492,7 +1465,9 @@ namespace Parser
                 $@"State: {State} / ThreadRunning: {ThreadRunning} / ErrorCode: {parserInfoState.LastErrorCode} / PercentageOfProgress: {parserInfoState.Percentage}");
 
             if (parserInfoState.Exception != null)
+            {
                 _debugger.WriteDebuggingMsg($@"Exception: {parserInfoState.Exception.Message}");
+            }
 
             // Set state to "idle"
             if (parserInfoState.LastErrorCode == DataTypes.ParserErrorCodes.Finished || parserInfoState.LastErrorCode < 0)
@@ -1520,7 +1495,10 @@ namespace Parser
                         }
                     }
                 }
-            }       
+            }
+
+            // Reset the LastException because it has been set to the DLL caller
+            LastException = null;
         }
 
         #endregion Methodes
