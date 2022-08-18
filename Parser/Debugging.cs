@@ -1,6 +1,6 @@
 ﻿//MIT License
 //
-//Copyright(c) 2021 nessie1980(nessie1980 @gmx.de)
+//Copyright(c) 2018 - 2022 nessie1980(nessie1980@gmx.de)
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -39,12 +39,12 @@ namespace Parser
         /// <summary>
         /// Fixed file name for the text file debugging
         /// </summary>
-        public string DebuggingFileName = @"Debugging_Parser.txt";
+        public string DebuggingFileName { set; get; }
 
         /// <summary>
         /// Fixed path name for the text file debugging
         /// </summary>
-        public string DebuggingPath = @"C:\\";
+        public string DebuggingPath { set; get; }
 
         #endregion Properties
 
@@ -53,7 +53,9 @@ namespace Parser
         public Debugging(int instance, string path)
         {
             ParserInstance = instance;
-            DebuggingPath = path;
+
+            DebuggingFileName = @"Debugging_Parser.txt";
+            DebuggingPath = path == string.Empty ? @"C:\\" : path;
         }
 
         /// <summary>

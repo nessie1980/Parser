@@ -1,6 +1,6 @@
 ﻿//MIT License
 //
-//Copyright(c) 2021 nessie1980(nessie1980 @gmx.de)
+//Copyright(c) 2018 - 2022 nessie1980(nessie1980@gmx.de)
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -79,12 +79,13 @@ namespace Parser
             InvalidWebSiteGiven = -3,
             NoRegexListGiven = -4,
             NoWebContentLoaded = -5,
-            ParsingFailed = -6,
-            CancelThread = -7,
-            WebExceptionOccurred = -8,
-            FileExceptionOccurred = -9,
-            JsonExceptionOccurred = -10,
-            ExceptionOccurred = -11
+            JsonError = -6,
+            ParsingFailed = -7,
+            CancelThread = -8,
+            WebExceptionOccurred = -9,
+            FileExceptionOccurred = -10,
+            JsonExceptionOccurred = -11,
+            ExceptionOccurred = -12
         }
 
         /// <summary>

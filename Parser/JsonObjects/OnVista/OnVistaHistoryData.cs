@@ -1,6 +1,6 @@
 ﻿//MIT License
 //
-//Copyright(c) 2021 nessie1980(nessie1980 @gmx.de)
+//Copyright(c) 2018 - 2022 nessie1980(nessie1980@gmx.de)
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -24,77 +24,41 @@ namespace Parser.JsonObjects.OnVista
 {
     internal class HistoryData
     {
-    
-        //public string EntityType { get; set; }
-
-
-        //public string EntityValue { get; set; }
-
-
-        //public Market Market { get; set; }
-
-
-        //public int IdInstrument { get; set; }
-
-
-        //public int IdNotation { get; set; }
-
-
-        //public string IsoCurrency { get; set; }
-
-
-        //public string UnitType { get; set; }
-
-        //public DateTime DatetimeStartAvailableHistory { get; set; }
-
-        //public DateTime DatetimeEndAvailableHistory { get; set; }
-
-
-        //public int IdTradingSchedule { get; set; }
-
+        /* Unused properties of the class
+        public string EntityType { get; set; }
+        public string EntityValue { get; set; }
+        public Market Market { get; set; }
+        public int IdInstrument { get; set; }
+        public int IdNotation { get; set; }
+        public string IsoCurrency { get; set; }
+        public string UnitType { get; set; }
+        public DateTime DatetimeStartAvailableHistory { get; set; }
+        public DateTime DatetimeEndAvailableHistory { get; set; }
+        public int IdTradingSchedule { get; set; }
+        */
 
         public int[] DatetimeLast { get; set; }
-
-
         public float[] First { get; set; }
-
-
         public float[] Last { get; set; }
-
-
         public float[] High { get; set; }
-
-
         public float[] Low { get; set; }
-
-
         public float[] Volume { get; set; }
 
-
-        //public int[] NumberPrices { get; set; }
-
-
-        //public string DisplayUnit { get; set; }
+        /* Unused properties of the class
+        public int[] NumberPrices { get; set; }
+        public string DisplayUnit { get; set; }
+        */
     }
 
-    //public class Market
-    //{
-
-    //    public string Name { get; set; }
-
-
-    //    public string CodeMarket { get; set; }
-
-
-    //    public string NameExchange { get; set; }
-
-
-    //    public string CodeExchange { get; set; }
-
-
-    //    public int IdNotation { get; set; }
-
-
-    //    public string IsoCountry { get; set; }
-    //}
+    /* Unused class
+    public class Market
+    {
+        public string Name { get; set; }
+        public string CodeMarket { get; set; }
+        public string NameExchange { get; set; }
+        public string CodeExchange { get; set; }
+        public int IdNotation { get; set; }
+        public string IsoCountry { get; set; }
+    }
+    */
 }

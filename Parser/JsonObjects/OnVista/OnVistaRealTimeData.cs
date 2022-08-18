@@ -1,6 +1,6 @@
 ﻿//MIT License
 //
-//Copyright(c) 2021 nessie1980(nessie1980 @gmx.de)
+//Copyright(c) 2018 - 2022 nessie1980(nessie1980@gmx.de)
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -24,219 +24,164 @@ namespace Parser.JsonObjects.OnVista
 {
     internal class RealTimeData
     {
-
-        //public float first { get; set; }
-
-        //public DateTimeFirst datetimeFirst { get; set; }
+        /* Unused properties of the class
+        public float First { get; set; }
+        public DateTimeFirst DatetimeFirst { get; set; }
+        */
 
         public float Price { get; set; }
-
         public DateTimePrice DatetimePrice { get; set; }
 
-        //public int volume { get; set; }
-
-        //public object addendum { get; set; }
-
-        //public int money { get; set; }
-
-        //public float high { get; set; }
-
-        //public DateTimeHigh datetimeHigh { get; set; }
-
-        //public float low { get; set; }
-
-        //public DateTimeLow datetimeLow { get; set; }
-
-        //public int totalVolume { get; set; }
-
-        //public float totalMoney { get; set; }
-
-        //public int numberPrices { get; set; }
+        /* Unused properties of the class
+        public int Volume { get; set; }
+        public object Addendum { get; set; }
+        public int Money { get; set; }
+        public float High { get; set; }
+        public DateTimeHigh DatetimeHigh { get; set; }
+        public float Low { get; set; }
+        public DateTimeLow DatetimeLow { get; set; }
+        public int TotalVolume { get; set; }
+        public float TotalMoney { get; set; }
+        public int NumberPrices { get; set; }
+        */
 
         public float PreviousLast { get; set; }
 
-        //public DateTimePreviousLast datetimePreviousLast { get; set; }
-
-        //public int idTypePriceTotals { get; set; }
-
-        //public float performance { get; set; }
-
-        //public float performancePct { get; set; }
-
-        //public float ask { get; set; }
-
-        //public DateTimeAsk datetimeAsk { get; set; }
-
-        //public int volumeAsk { get; set; }
-
-        //public object moneyAsk { get; set; }
-
-        //public object numberOrdersAsk { get; set; }
-
-        //public float bid { get; set; }
-
-        //public DateTimeBid datetimeBid { get; set; }
-
-        //public int volumeBid { get; set; }
-
-        //public object moneyBid { get; set; }
-
-        //public object numberOrdersBid { get; set; }
-
-        //public int volume4Weeks { get; set; }
-
-        //public float highPrice1Year { get; set; }
-
-        //public DateTimeHighPrice1Year datetimeHighPrice1Year { get; set; }
-
-        //public float lowPrice1Year { get; set; }
-
-        //public DateTimeLowPrice1Year datetimeLowPrice1Year { get; set; }
-
-        //public float performance1Year { get; set; }
-
-        //public float performance1YearPct { get; set; }
-
+        /* Unused properties of the class
+        public DateTimePreviousLast DatetimePreviousLast { get; set; }
+        public int IdTypePriceTotals { get; set; }
+        public float Performance { get; set; }
+        public float PerformancePct { get; set; }
+        public float Ask { get; set; }
+        public DateTimeAsk DatetimeAsk { get; set; }
+        public int VolumeAsk { get; set; }
+        public object MoneyAsk { get; set; }
+        public object NumberOrdersAsk { get; set; }
+        public float Bid { get; set; }
+        public DateTimeBid DatetimeBid { get; set; }
+        public int VolumeBid { get; set; }
+        public object MoneyBid { get; set; }
+        public object NumberOrdersBid { get; set; }
+        public int Volume4Weeks { get; set; }
+        public float HighPrice1Year { get; set; }
+        public DateTimeHighPrice1Year DatetimeHighPrice1Year { get; set; }
+        public float LowPrice1Year { get; set; }
+        public DateTimeLowPrice1Year DatetimeLowPrice1Year { get; set; }
+        public float Performance1Year { get; set; }
+        public float Performance1YearPct { get; set; }
         public int IdNotation { get; set; }
-
-        //public int idTimezone { get; set; }
-
-        //public int idExchange { get; set; }
-
-        //public string codeExchange { get; set; }
-
-        //public int idContributor { get; set; }
-
-        //public string codeContributor { get; set; }
-
+        public int IdTimezone { get; set; }
+        public int IdExchange { get; set; }
+        public string CodeExchange { get; set; }
+        public int IdContributor { get; set; }
+        public string CodeContributor { get; set; }
         public int IdCurrency { get; set; }
+        */
 
         public string IsoCurrency { get; set; }
 
-        //public int idTradingSchedule { get; set; }
-
-        //public int idQualityPrice { get; set; }
-
-        //public string codeQualityPrice { get; set; }
-
-        //public int idSalesProduct { get; set; }
-
-        //public int idQualityPriceBidAsk { get; set; }
-
-        //public string codeQualityPriceBidAsk { get; set; }
-
-        //public int idSalesProductBidAsk { get; set; }
-
-        //public int idInstrument { get; set; }
-
-        //public int idTypeInstrument { get; set; }
-
-        //public string codeTool { get; set; }
-
-        //public int idUnitPrice { get; set; }
-
-        //public int amount { get; set; }
-
-        //public object sourcePrice { get; set; }
-
-        //public object sourceAsk { get; set; }
-
-        //public object sourceBid { get; set; }
-
-        //public int propertyFlagsPrice { get; set; }
-
-        //public int propertyFlagsAsk { get; set; }
-
-        //public int propertyFlagsBid { get; set; }
+        /* Unused properties of the class
+        public int IdTradingSchedule { get; set; }
+        public int IdQualityPrice { get; set; }
+        public string CodeQualityPrice { get; set; }
+        public int IdSalesProduct { get; set; }
+        public int IdQualityPriceBidAsk { get; set; }
+        public string CodeQualityPriceBidAsk { get; set; }
+        public int IdSalesProductBidAsk { get; set; }
+        public int IdInstrument { get; set; }
+        public int IdTypeInstrument { get; set; }
+        public string CodeTool { get; set; }
+        public int IdUnitPrice { get; set; }
+        public int Amount { get; set; }
+        public object SourcePrice { get; set; }
+        public object SourceAsk { get; set; }
+        public object SourceBid { get; set; }
+        public int PropertyFlagsPrice { get; set; }
+        public int PropertyFlagsAsk { get; set; }
+        public int PropertyFlagsBid { get; set; }
+        */
     }
 
-    //public class DateTimeFirst
-    //{
-
-    //    public string localTime { get; set; }
-
-    //    public string localTimeZone { get; set; }
-
-    //    public int utcTimeStamp { get; set; }
-    //}
+    /* Unused class
+    public class DateTimeFirst
+    {
+        public string LocalTime { get; set; }
+        public string LocalTimeZone { get; set; }
+        public int UtcTimeStamp { get; set; }
+    }
+    */
 
     public class DateTimePrice
     {
 
         public string LocalTime { get; set; }
 
+        /* Unused properties of the class
         public string LocalTimeZone { get; set; }
-
         public int UtcTimeStamp { get; set; }
+        */
     }
 
-    //public class DateTimeHigh
-    //{
+    /* Unused class
+    public class DateTimeHigh
+    {
+        public string LocalTime { get; set; }
+        public string LocalTimeZone { get; set; }
+        public int UtcTimeStamp { get; set; }
+    }
+    */
 
-    //    public string localTime { get; set; }
+    /* Unused class
+    public class DateTimeLow
+    {
+        public string LocalTime { get; set; }
+        public string LocalTimeZone { get; set; }
+        public int UtcTimeStamp { get; set; }
+    }
+    */
 
-    //    public string localTimeZone { get; set; }
+    /* Unused class
+    public class DateTimePreviousLast
+    {
+        public string LocalTime { get; set; }
+        public string LocalTimeZone { get; set; }
+        public int UtcTimeStamp { get; set; }
+    }
+    */
 
-    //    public int utcTimeStamp { get; set; }
-    //}
+    /* Unused class
+    public class DateTimeAsk
+    {
+        public string LocalTime { get; set; }
+        public string LocalTimeZone { get; set; }
+        public int UtcTimeStamp { get; set; }
+    }
+    */
 
-    //public class DateTimeLow
-    //{
+    /* Unused class
+    public class DateTimeBid
+    {
+        public string LocalTime { get; set; }
+        public string LocalTimeZone { get; set; }
+        public int UtcTimeStamp { get; set; }
+    }
+    */
 
-    //    public string localTime { get; set; }
+    /* Unused class
+    public class DateTimeHighPrice1Year
+    {
+        public string LocalTime { get; set; }
+        public string LocalTimeZone { get; set; }
+        public int UtcTimeStamp { get; set; }
+    }
+    */
 
-    //    public string localTimeZone { get; set; }
-
-    //    public int utcTimeStamp { get; set; }
-    //}
-
-    //public class DateTimePreviousLast
-    //{
-
-    //    public string LocalTime { get; set; }
-
-    //    public string LocalTimeZone { get; set; }
-
-    //    public int UtcTimeStamp { get; set; }
-    //}
-
-    //public class DateTimeAsk
-    //{
-
-    //    public string localTime { get; set; }
-
-    //    public string localTimeZone { get; set; }
-
-    //    public int utcTimeStamp { get; set; }
-    //}
-
-    //public class DateTimeBid
-    //{
-
-    //    public string localTime { get; set; }
-
-    //    public string localTimeZone { get; set; }
-
-    //    public int utcTimeStamp { get; set; }
-    //}
-
-    //public class DateTimeHighPrice1Year
-    //{
-
-    //    public string localTime { get; set; }
-
-    //    public string localTimeZone { get; set; }
-
-    //    public int utcTimeStamp { get; set; }
-    //}
-
-    //public class DateTimeLowPrice1Year
-    //{
-
-    //    public string localTime { get; set; }
-
-    //    public string localTimeZone { get; set; }
-
-    //    public int utcTimeStamp { get; set; }
-    //}
+    /* Unused class
+    public class DateTimeLowPrice1Year
+    {
+        public string LocalTime { get; set; }
+        public string LocalTimeZone { get; set; }
+        public int UtcTimeStamp { get; set; }
+    }
+    */
 }
