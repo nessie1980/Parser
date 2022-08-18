@@ -1,6 +1,6 @@
 ﻿//MIT License
 //
-//Copyright(c) 2021 nessie1980(nessie1980 @gmx.de)
+//Copyright(c) 2018 - 2022 nessie1980(nessie1980@gmx.de)
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,19 @@ using System.Collections.Generic;
 
 namespace Parser.JsonObjects.Yahoo
 {
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+    /* Unused class
     public class Adjclose
     {
         public List<double?> AdjClose { get; set; }
     }
+    */
 
     public partial class Result
     {
+        /* Unused properties of the class
         public Meta Meta { get; set; }
+        */
+
         public List<int> Timestamp { get; set; }
         public Indicators Indicators { get; set; }
     }
@@ -40,22 +44,31 @@ namespace Parser.JsonObjects.Yahoo
     public class Chart
     {
         public List<Result> Result { get; set; }
+        
+        /* Unused properties of the class
         public object Error { get; set; }
+        */
     }
 
+    /* Unused class
     public class CurrentTradingPeriod
     {
         public Pre Pre { get; set; }
         public Regular Regular { get; set; }
         public Post Post { get; set; }
     }
+    */
 
     public class Indicators
     {
         public List<Quote> Quote { get; set; }
+
+        /* Unused properties of the class
         public List<Adjclose> Adjclose { get; set; }
+        */
     }
 
+    /* Unused class
     public class Meta
     {
         public string Currency { get; set; }
@@ -75,7 +88,9 @@ namespace Parser.JsonObjects.Yahoo
         public string Range { get; set; }
         public List<string> ValidRanges { get; set; }
     }
+    */
 
+    /* Unused class
     public class Post
     {
         public string Timezone { get; set; }
@@ -83,7 +98,9 @@ namespace Parser.JsonObjects.Yahoo
         public int Start { get; set; }
         public int Gmtoffset { get; set; }
     }
+    */
 
+    /* Unused class
     public class Pre
     {
         public string Timezone { get; set; }
@@ -91,6 +108,7 @@ namespace Parser.JsonObjects.Yahoo
         public int End { get; set; }
         public int Gmtoffset { get; set; }
     }
+    */
 
     public class Quote
     {
@@ -101,6 +119,7 @@ namespace Parser.JsonObjects.Yahoo
         public List<int?> Volume { get; set; }
     }
 
+    /* Unused class
     public class Regular
     {
         public string Timezone { get; set; }
@@ -108,6 +127,7 @@ namespace Parser.JsonObjects.Yahoo
         public int Start { get; set; }
         public int Gmtoffset { get; set; }
     }
+    */
 
     public class HistoryData
     {

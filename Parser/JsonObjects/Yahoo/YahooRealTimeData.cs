@@ -1,6 +1,6 @@
 ﻿//MIT License
 //
-//Copyright(c) 2021 nessie1980(nessie1980 @gmx.de)
+//Copyright(c) 2018 - 2022 nessie1980(nessie1980@gmx.de)
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -26,94 +26,110 @@ namespace Parser.JsonObjects.Yahoo
 {
     public class QuoteResponse
     {
-        public List<Result> result;
-        public object error;
+        public List<Result> Result { get; set; }
+
+        /* Unused properties of the class
+        public object Error;
+        */
     }
 
     public partial class Result
     {
-        public string language;
-        public string region;
-        public string quoteType;
-        public string typeDisp;
-        public string quoteSourceName;
-        public bool triggerable;
-        public string customPriceAlertConfidence;
-        public string currency;
-        public string exchange;
-        public string shortName;
-        public string longName;
-        public string messageBoardId;
-        public string exchangeTimezoneName;
-        public string exchangeTimezoneShortName;
-        public int gmtOffSetMilliseconds;
-        public string market;
-        public bool esgPopulated;
-        public string marketState;
-        public int priceHint;
-        public double postMarketChangePercent;
-        public int postMarketTime;
-        public double postMarketPrice;
-        public double postMarketChange;
-        public double regularMarketChange;
-        public double regularMarketChangePercent;
-        public int regularMarketTime;
-        public double regularMarketPrice;
-        public double regularMarketDayHigh;
-        public string regularMarketDayRange;
-        public double regularMarketDayLow;
-        public int regularMarketVolume;
-        public double regularMarketPreviousClose;
-        public double bid;
-        public double ask;
-        public int bidSize;
-        public int askSize;
-        public string fullExchangeName;
-        public string financialCurrency;
-        public double regularMarketOpen;
-        public int averageDailyVolume3Month;
-        public int averageDailyVolume10Day;
-        public double fiftyTwoWeekLowChange;
-        public double fiftyTwoWeekLowChangePercent;
-        public string fiftyTwoWeekRange;
-        public double fiftyTwoWeekHighChange;
-        public bool tradeable;
-        public double fiftyTwoWeekHighChangePercent;
-        public double fiftyTwoWeekLow;
-        public double fiftyTwoWeekHigh;
-        public int dividendDate;
-        public int earningsTimestamp;
-        public int earningsTimestampStart;
-        public int earningsTimestampEnd;
-        public double trailingAnnualDividendRate;
-        public double trailingPE;
-        public double trailingAnnualDividendYield;
-        public double epsTrailingTwelveMonths;
-        public double epsForward;
-        public double epsCurrentYear;
-        public double priceEpsCurrentYear;
-        public long sharesOutstanding;
-        public double bookValue;
-        public double fiftyDayAverage;
-        public double fiftyDayAverageChange;
-        public double fiftyDayAverageChangePercent;
-        public double twoHundredDayAverage;
-        public double twoHundredDayAverageChange;
-        public double twoHundredDayAverageChangePercent;
-        public long marketCap;
-        public double forwardPE;
-        public double priceToBook;
-        public int sourceInterval;
-        public int exchangeDataDelayedBy;
-        public double pageViewGrowthWeekly;
-        public string averageAnalystRating;
-        public long firstTradeDateMilliseconds;
-        public string displayName;
-        public string symbol;
+        /* Unused properties of the class
+        public string Language;
+        public string Region;
+        public string QuoteType;
+        public string TypeDisp;
+        public string QuoteSourceName;
+        public bool Triggerable;
+        public string CustomPriceAlertConfidence;
+        */
+        public string Currency { get; set; }
+
+        /* Unused properties of the class
+        public string Exchange;
+        public string ShortName;
+        public string LongName;
+        public string MessageBoardId;
+        public string ExchangeTimezoneName;
+        public string ExchangeTimezoneShortName;
+        public int GmtOffSetMilliseconds;
+        public string Market;
+        public bool EsgPopulated;
+        public string MarketState;
+        public int PriceHint;
+        public double PostMarketChangePercent;
+        public int PostMarketTime;
+        public double PostMarketPrice;
+        public double PostMarketChange;
+        public double RegularMarketChange;
+        public double RegularMarketChangePercent;
+        */
+
+        public int RegularMarketTime { get; set; }
+        public double RegularMarketPrice { get; set; }
+
+        /* Unused properties of the class
+        public double RegularMarketDayHigh;
+        public string RegularMarketDayRange;
+        public double RegularMarketDayLow;
+        public int RegularMarketVolume;
+        */
+
+        public double RegularMarketPreviousClose { get; set; }
+
+        /* Unused properties of the class
+        public double Bid;
+        public double Ask;
+        public int BidSize;
+        public int AskSize;
+        public string FullExchangeName;
+        public string FinancialCurrency;
+        public double RegularMarketOpen;
+        public int AverageDailyVolume3Month;
+        public int AverageDailyVolume10Day;
+        public double FiftyTwoWeekLowChange;
+        public double FiftyTwoWeekLowChangePercent;
+        public string FiftyTwoWeekRange;
+        public double FiftyTwoWeekHighChange;
+        public bool Tradeable;
+        public double FiftyTwoWeekHighChangePercent;
+        public double FiftyTwoWeekLow;
+        public double FiftyTwoWeekHigh;
+        public int DividendDate;
+        public int EarningsTimestamp;
+        public int EarningsTimestampStart;
+        public int EarningsTimestampEnd;
+        public double TrailingAnnualDividendRate;
+        public double TrailingPe;
+        public double TrailingAnnualDividendYield;
+        public double EpsTrailingTwelveMonths;
+        public double EpsForward;
+        public double EpsCurrentYear;
+        public double PriceEpsCurrentYear;
+        public long SharesOutstanding;
+        public double GookValue;
+        public double FiftyDayAverage;
+        public double FiftyDayAverageChange;
+        public double FiftyDayAverageChangePercent;
+        public double TwoHundredDayAverage;
+        public double TwoHundredDayAverageChange;
+        public double TwoHundredDayAverageChangePercent;
+        public long MarketCap;
+        public double ForwardPe;
+        public double PriceToBook;
+        public int SourceInterval;
+        public int ExchangeDataDelayedBy;
+        public double PageViewGrowthWeekly;
+        public string AverageAnalystRating;
+        public long FirstTradeDateMilliseconds;
+        public string DisplayName;
+        public string Symbol;
+        */
     }
 
     public class RealTimeData
     {
-        public QuoteResponse quoteResponse;
+        public QuoteResponse QuoteResponse { get; set; }
     }
 }
